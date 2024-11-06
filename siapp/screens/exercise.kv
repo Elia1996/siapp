@@ -1,0 +1,33 @@
+<ExerciseScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: information_label
+            text: "Cosa da memorizzare"
+            font_size: 24
+        Label:
+            id: pao_label
+            text: "Personaggio - Azione - Oggetto"
+            font_size: 20
+            opacity: 0  # Nasconde il PAO finché l'utente non preme "Mostra"
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            Button:
+                text: "Mostra PAO"
+                on_release: pao_label.opacity = 1  # Mostra PAO
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            Button:
+                text: "Corretto"
+                on_release: root.record_response('right')
+            Button:
+                text: "Sbagliato"
+                on_release: root.record_response('wrong')
+            Button:
+                text: "Difficile"
+                on_release: root.record_response('difficult')
+        Label:
+            id: status
+            text: ""

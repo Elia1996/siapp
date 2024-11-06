@@ -1,0 +1,25 @@
+<MainMenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 20
+        padding: 50
+
+        Label:
+            text: "Memory App"
+            font_size: 32
+            size_hint_y: None
+            height: 100
+
+        Button:
+            text: "Inserimento"
+            font_size: 24
+            size_hint_y: None
+            height: 60
+            on_release: app.root.current = 'insertion'
+
+        Button:
+            text: "Esercizio"
+            font_size: 24
+            size_hint_y: None
+            height: 60
+            on_release: app.root.current = 'exercise'

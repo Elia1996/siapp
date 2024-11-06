@@ -1,0 +1,53 @@
+<InsertionScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 20
+        padding: 50
+
+        Label:
+            text: "Inserimento - Crea Associazione"
+            font_size: 28
+            size_hint_y: None
+            height: 80
+
+        TextInput:
+            id: information
+            hint_text: 'Informazione'
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        TextInput:
+            id: character
+            hint_text: 'Personaggio'
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        TextInput:
+            id: action
+            hint_text: 'Azione'
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        TextInput:
+            id: object
+            hint_text: 'Oggetto'
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        Button:
+            text: "Salva Associazione"
+            font_size: 24
+            size_hint_y: None
+            height: 50
+            on_release: root.save_association(information.text, character.text, action.text, object.text)
+
+        Button:
+            text: "Indietro"
+            font_size: 24
+            size_hint_y: None
+            height: 50
+            on_release: app.root.current = 'main'

@@ -5,15 +5,30 @@ from db.models import Association, engine
 from utils.retention_index import retention_index
 
 
+def image_path_to_bytes(image_path: str) -> bytes:
+    with open(image_path, "rb") as file:
+        image_bytes = file.read()
+    return image_bytes
+
+
 def add_association(
     information: str,
+    information_image: Optional[bytes] = None,
     character_text: Optional[str] = None,
+    pao_image: Optional[bytes] = None,
     action_text: Optional[str] = None,
     object_text: Optional[str] = None,
 ):
+    if information_image is not None:
+        information_image = image_path_to_bytes(information_image)
+    if pao_image is not None:
+        pao_image = image_path_to_bytes(pao_image)
+
     with Session(engine) as session:
         association = Association(
+            information_image=information_image,
             information=information,
+            pao_image=pao_image,
             character_text=character_text,
             action_text=action_text,
             object_text=object_text,
@@ -92,7 +107,9 @@ def update_association(association: Association):
         association_db = session.exec(statement).first()
         # Update the association
         association_db.information = association.information
+        association_db.information_image = association.information_image
         association_db.character_text = association.character_text
+        association_db.pao_image = association.pao_image
         association_db.action_text = association.action_text
         association_db.object_text = association.object_text
         association_db.last_response_time_I_to_PAO = (
@@ -120,5 +137,12 @@ def update_association(association: Association):
 def get_associations(n_associations: int = 5):
     with Session(engine) as session:
         statements = select(Association).limit(n_associations)
+        associations = session.exec(statements).all()
+        return associations
+
+
+def get_all_associations():
+    with Session(engine) as session:
+        statements = select(Association)
         associations = session.exec(statements).all()
         return associations

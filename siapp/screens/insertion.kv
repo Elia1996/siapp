@@ -1,53 +1,142 @@
+<ListItem@BoxLayout>:
+    information_text: ""
+    character_text: ""
+    action_text: ""
+    object_text: ""
+    response_time: ""
+
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: dp(30)
+
+    Label:
+        text: root.information_text
+    Label:
+        text: root.character_text
+    Label:
+        text: root.action_text
+    Label:
+        text: root.object_text
+    Label:
+        text: root.response_time
+
 <InsertionScreen>:
     BoxLayout:
         orientation: 'vertical'
-        spacing: 20
-        padding: 50
+        spacing: 10
+        padding: 30
 
-        Label:
-            text: "Inserimento - Crea Associazione"
-            font_size: 28
-            size_hint_y: None
-            height: 80
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Inserimento - Crea Associazione"
+                font_size: 28
+                height: 30
 
-        TextInput:
-            id: information
-            hint_text: 'Informazione'
-            multiline: False
-            size_hint_y: None
-            height: 40
+            BoxLayout:
+                orientation: 'horizontal'
+                height: dp(150)
+                TextInput:
+                    id: information
+                    hint_text: 'Informazione'
+                    multiline: False
+                    size_hint_y: None
+                    height: 40
 
-        TextInput:
-            id: character
-            hint_text: 'Personaggio'
-            multiline: False
-            size_hint_y: None
-            height: 40
+                Image:
+                    id: information_image  # This will be accessed in Python code to update the image source
+                    allow_stretch: False
+                    keep_ratio: True
 
-        TextInput:
-            id: action
-            hint_text: 'Azione'
-            multiline: False
-            size_hint_y: None
-            height: 40
+                Button:
+                    text: "Choose an Image"
+                    on_release: root.open_filechooser_info()  # Calls the method to open the file chooser
 
-        TextInput:
-            id: object
-            hint_text: 'Oggetto'
-            multiline: False
-            size_hint_y: None
-            height: 40
+            BoxLayout:
+                orientation: 'horizontal'
+                height: dp(150)
+                BoxLayout:
+                    orientation: 'vertical'
+                    TextInput:
+                        id: character
+                        hint_text: 'Personaggio'
+                        multiline: False
+                        size_hint_y: None
+                        height: 30
 
-        Button:
-            text: "Salva Associazione"
-            font_size: 24
-            size_hint_y: None
-            height: 50
-            on_release: root.save_association(information.text, character.text, action.text, object.text)
+                    TextInput:
+                        id: action
+                        hint_text: 'Azione'
+                        multiline: False
+                        size_hint_y: None
+                        height: 30
 
-        Button:
-            text: "Indietro"
-            font_size: 24
+                    TextInput:
+                        id: object
+                        hint_text: 'Oggetto'
+                        multiline: False
+                        size_hint_y: None
+                        height: 30
+
+                Image:
+                    id: pao_image  # This will be accessed in Python code to update the image source
+                    allow_stretch: False
+                    keep_ratio: True
+
+                Button:
+                    text: "Choose an Image"
+                    on_release: root.open_filechooser_pao()  # Calls the method to open the file chooser
+
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: "Salva Associazione"
+                    size_hint_y: None
+                    height: 30
+                    on_release: root.save_association(information.text, character.text, action.text, object.text, information_image.source, pao_image.source)
+
+                Button:
+                    text: "Indietro"
+                    size_hint_y: None
+                    height: 30
+                    on_release: app.root.current = 'main'
+        
+        Widget:
             size_hint_y: None
-            height: 50
-            on_release: app.root.current = 'main'
+            height: dp(1)
+            canvas.before:
+                Color:
+                    rgba: 0.8, 0.8, 0.8, 1  # Colore della linea divisoria
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        BoxLayout:
+            size_hint_y: None
+            height: dp(10)
+            orientation: 'horizontal'
+            Label:
+                text: "Informazione"
+                bold: True
+            Label:
+                text: "Personaggio"
+                bold: True
+            Label:
+                text: "Azione"
+                bold: True
+            Label:
+                text: "Oggetto"
+                bold: True
+            Label:
+                text: "Tempo di Risposta"
+                bold: True
+
+        RecycleView:
+            id: associations_list
+            viewclass: 'ListItem'  # Use custom item layout
+
+            RecycleBoxLayout:
+                default_size: None, dp(30)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'

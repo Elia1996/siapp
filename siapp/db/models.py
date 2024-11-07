@@ -6,7 +6,9 @@ from typing import Optional
 class Association(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True)
     information: str
+    information_image: Optional[bytes] = None
     character_text: Optional[str] = None
+    pao_image: Optional[bytes] = None
     action_text: Optional[str] = None
     object_text: Optional[str] = None
     last_response_time_I_to_PAO: Optional[float] = None

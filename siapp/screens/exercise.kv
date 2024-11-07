@@ -1,33 +1,65 @@
 <ExerciseScreen>:
     BoxLayout:
         orientation: 'vertical'
+        spacing: 20
+        padding: 50
+
         Label:
             id: information_label
-            text: "Cosa da memorizzare"
+            text: "Information"
             font_size: 24
+            size_hint_y: None
+            height: 40
+            opacity: 0  # Initially hidden until user chooses to show
+
         Label:
-            id: pao_label
-            text: "Personaggio - Azione - Oggetto"
+            id: character_label
+            text: "Character"
             font_size: 20
-            opacity: 0  # Nasconde il PAO finché l'utente non preme "Mostra"
+            opacity: 0  # Initially hidden until user chooses to show
+            size_hint_y: None
+            height: 40
+
+        Label:
+            id: action_label
+            text: "Action"
+            font_size: 20
+            opacity: 0  # Initially hidden until user chooses to show
+            size_hint_y: None
+            height: 40
+
+        Label:
+            id: object_label
+            text: "Object"
+            font_size: 20
+            opacity: 0  # Initially hidden until user chooses to show
+            size_hint_y: None
+            height: 40
+
         BoxLayout:
             size_hint_y: None
-            height: 50
+            height: 40
             Button:
-                text: "Mostra PAO"
-                on_release: pao_label.opacity = 1  # Mostra PAO
+                text: "Show Solution"
+                on_release: root.show_solution()  # Show the PAO details
+
         BoxLayout:
             size_hint_y: None
-            height: 50
+            height: 40
             Button:
-                text: "Corretto"
+                text: "Right"
                 on_release: root.record_response('right')
             Button:
-                text: "Sbagliato"
+                text: "Wrong"
                 on_release: root.record_response('wrong')
             Button:
-                text: "Difficile"
+                text: "Right but Difficult"
                 on_release: root.record_response('difficult')
-        Label:
-            id: status
-            text: ""
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Button:
+                text: "Back"
+                on_release: app.root.current = 'main'

@@ -60,7 +60,6 @@ class ExerciseScreen(Screen):
     def next_association(self):
         # Move to the next association if available
         if not self.associations:
-            print("Element number: ", get_element_number())
             if get_element_number() == 0:
                 self.ids.information_label.text = "No associations available"
                 return

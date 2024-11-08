@@ -60,6 +60,4 @@ def retention_index(
     else:
         raise TypeError("last_refresh must be a timedelta or a datetime object")
     K_value = Ktime(Lt(refresh_number, difficulty), RR_to_refresh)
-    print(f"Lt: {Lt(refresh_number, difficulty)}")
-    print(delta_time, K_value)
     return RR(delta_time, K_value)

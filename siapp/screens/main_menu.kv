@@ -1,25 +1,35 @@
 <MainMenuScreen>:
-    BoxLayout:
+    MDBoxLayout:
         orientation: 'vertical'
         spacing: 20
         padding: 50
 
-        Label:
-            text: "Memory App"
+        MDLabel:
+            text: "Self Improvement App"
             font_size: 32
             size_hint_y: None
             height: 100
 
-        Button:
+        MDFlatButton:
+            text: "Hours Log"
+            font_size: 24
+            size_hint_y: None
+            height: 60
+            on_release: app.root.current = 'hourslog'
+            md_bg_color: app.theme_cls.primary_color
+
+        MDFlatButton:
             text: "Inserimento"
             font_size: 24
             size_hint_y: None
             height: 60
             on_release: app.root.current = 'insertion'
+            md_bg_color: app.theme_cls.primary_color
 
-        Button:
+        MDFlatButton:
             text: "Esercizio"
             font_size: 24
             size_hint_y: None
             height: 60
             on_release: app.root.current = 'exercise'
+            md_bg_color: app.theme_cls.primary_color

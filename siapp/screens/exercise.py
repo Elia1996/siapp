@@ -1,9 +1,8 @@
 import random
-from kivy.uix.screenmanager import Screen
-from db.database import (
+from kivymd.uix.screen import MDScreen
+from siapp.db.database import (
     get_associations,
     calculate_retention_index,
-    Association,
     get_element_number,
     update_association,
 )
@@ -22,7 +21,7 @@ class FlashcardDirection(Enum):
 Builder.load_file("screens/exercise.kv")
 
 
-class ExerciseScreen(Screen):
+class ExerciseScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.associations = []

@@ -1,0 +1,59 @@
+<HoursSummaryList@MDBoxLayout>:
+    date: ""
+    work_time: ""
+    lunch_break: ""
+    work_break: ""
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: self.minimum_height
+    edit_association: None
+    association_id: 0
+
+    MDLabel:
+        text: root.date
+    MDLabel:
+        text: root.work_time
+    MDLabel:
+        text: root.lunch_break
+    MDLabel:    
+        text: root.work_break
+
+<HoursLogScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDRaisedButton:
+            id: hourslog
+            text: "You are Logged Out"
+            md_bg_color: (0, 1, 0, 1)
+            on_release: root.add_log(self)
+        MDRaisedButton:
+            id: export
+            text: "Export data"
+            on_release: root.export()
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDBoxLayout:
+                size_hint_y: 0.3
+                orientation: 'horizontal'
+                MDLabel:
+                    text: "Date"
+                    bold: True
+                MDLabel:
+                    text: "Work Time"
+                    bold: True
+                MDLabel:
+                    text: "Lunch Break"
+                    bold: True
+                MDLabel:
+                    text: "Pause"
+                    bold: True
+
+            RecycleView:
+                id: hours_summary
+                viewclass: 'HoursSummaryList'  # Use custom item layout
+                RecycleBoxLayout:
+                    default_size: None, dp(25)
+                    size_hint_y: None
+                    default_size_hint: 1, None
+                    height: self.minimum_height
+                    orientation: 'vertical'

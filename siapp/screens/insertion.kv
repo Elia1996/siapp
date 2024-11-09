@@ -1,32 +1,47 @@
-<ListItem@BoxLayout>:
+<ListItem@MDBoxLayout>:
     information_text: ""
     character_text: ""
     action_text: ""
     object_text: ""
     response_time: ""
-
     orientation: 'horizontal'
     size_hint_y: None
-    height: dp(30)
+    height: self.minimum_height
+    edit_association: None
+    association_id: 0
 
-    Label:
+    MDLabel:
         text: root.information_text
-    Label:
+        font_size: 10
+    MDLabel:
         text: root.character_text
-    Label:
+        font_size: 10
+    MDLabel:
+        size_hint_x: 2.5
         text: root.action_text
-    Label:
+        font_size: 10
+    MDLabel:    
+        size_hint_x: 1.5
         text: root.object_text
-    Label:
+        font_size: 10
+    MDLabel:
         text: root.response_time
+        font_size: 10
+    MDRaisedButton:
+        size_hint_x: 0.1
+        pos_hint: {"center_x": 0.5}
+        text_color: app.theme_cls.primary_color
+        on_release: root.edit_association(root.association_id)
+
+    
 
 <InsertionScreen>:
-    BoxLayout:
+    MDBoxLayout:
         orientation: 'vertical'
-        spacing: 3
+        spacing: 5
         padding: 3
 
-        BoxLayout:
+        MDBoxLayout:
             #canvas.before:
             #    Color:
             #        rgba: 0, 1, 0, 1
@@ -34,36 +49,42 @@
             #        # self here refers to the widget i.e FloatLayout
             #        pos: self.pos
             #        size: self.size
-            size_hint_y: 4 
+            size_hint_y: 3
+            padding: 5
+            spacing: 5
             background_color: 0, 0, 0, 0.1
             orientation: 'vertical'
-            Label:
+            MDLabel:
                 text: "Inserimento - Crea Associazione"
                 font_size: 24
                 size_hint_y: 0.2
 
-            BoxLayout:
+            MDBoxLayout:
                 orientation: 'horizontal'
                 padding: 5
+                spacing: 5
                 TextInput:
                     id: information
                     hint_text: 'Informazione'
                     multiline: False
 
-                Image:
-                    id: information_image  # This will be accessed in Python code to update the image source
-                    allow_stretch: False
-                    keep_ratio: True
+                MDCard:
+                    Image:
+                        id: information_image  # This will be accessed in Python code to update the image source
+                        allow_stretch: False
+                        keep_ratio: True
 
-                Button:
+                MDRaisedButton:
                     text: "Choose an Image"
                     size_hint_x: 0.4
                     on_release: root.open_filechooser_info()  # Calls the method to open the file chooser
 
-            BoxLayout:
+            MDBoxLayout:
                 orientation: 'horizontal'
                 padding: 5
-                BoxLayout:
+                spacing: 5
+                MDBoxLayout:
+                    spacing: 5
                     orientation: 'vertical'
                     TextInput:
                         id: character
@@ -80,28 +101,33 @@
                         hint_text: 'Oggetto'
                         multiline: False
 
-                Image:
-                    id: pao_image  # This will be accessed in Python code to update the image source
-                    allow_stretch: True
-                    keep_ratio: True
+                MDCard:
+                    Image:
+                        id: pao_image  # This will be accessed in Python code to update the image source
+                        allow_stretch: False
+                        keep_ratio: True
 
-                Button:
+                MDRaisedButton:
                     text: "Choose an Image"
                     size_hint_x: 0.4
+                    md_bg_color: app.theme_cls.primary_color
                     on_release: root.open_filechooser_pao()  # Calls the method to open the file chooser
 
-            BoxLayout:
+            MDBoxLayout:
                 padding: 5
+                spacing: 5
                 orientation: 'horizontal'
                 size_hint_y: 0.25
-                Button:
+                MDRaisedButton:
                     text: "Salva Associazione"
+                    md_bg_color: app.theme_cls.primary_color
                     on_release: root.save_association(information.text, character.text, action.text, object.text, information_image.source, pao_image.source)
 
-                Button:
+                MDRaisedButton:
                     text: "Indietro"
+                    md_bg_color: app.theme_cls.primary_color
                     on_release: app.root.current = 'main'
-        BoxLayout:
+        MDBoxLayout:
             orientation: 'vertical'
             #canvas.before:
             #    Color:
@@ -110,31 +136,43 @@
             #        # self here refers to the widget i.e FloatLayout
             #        pos: self.pos
             #        size: self.size
-            BoxLayout:
-                size_hint_y: 0.2
+            MDBoxLayout:
+                size_hint_y: 0.3
                 orientation: 'horizontal'
-                Label:
+                MDLabel:
                     text: "Informazione"
+                    font_size: 10
                     bold: True
-                Label:
+                MDLabel:
                     text: "Personaggio"
+                    font_size: 10
                     bold: True
-                Label:
+                MDLabel:
+                    size_hint_x: 2.5
+                    font_size: 10
                     text: "Azione"
                     bold: True
-                Label:
+                MDLabel:
+                    size_hint_x: 1.5
+                    font_size: 10
                     text: "Oggetto"
                     bold: True
-                Label:
+                MDLabel:
                     text: "Tempo di Risposta"
+                    font_size: 10
+                    bold: True
+                MDLabel:
+                    text: "Edit"
+                    size_hint_x: 0.6
+                    font_size: 10
                     bold: True
 
             RecycleView:
                 id: associations_list
                 viewclass: 'ListItem'  # Use custom item layout
-
                 RecycleBoxLayout:
                     default_size: None, dp(25)
+                    size_hint_y: None
                     default_size_hint: 1, None
                     height: self.minimum_height
                     orientation: 'vertical'

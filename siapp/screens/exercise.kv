@@ -1,10 +1,10 @@
 <ExerciseScreen>:
-    BoxLayout:
+    MDBoxLayout:
         orientation: 'vertical'
         spacing: 20
         padding: 50
 
-        Label:
+        MDLabel:
             id: information_label
             text: "Information"
             font_size: 24
@@ -12,7 +12,7 @@
             height: 40
             opacity: 0  # Initially hidden until user chooses to show
 
-        Label:
+        MDLabel:
             id: character_label
             text: "Character"
             font_size: 20
@@ -20,7 +20,7 @@
             size_hint_y: None
             height: 40
 
-        Label:
+        MDLabel:
             id: action_label
             text: "Action"
             font_size: 20
@@ -28,7 +28,7 @@
             size_hint_y: None
             height: 40
 
-        Label:
+        MDLabel:
             id: object_label
             text: "Object"
             font_size: 20
@@ -36,30 +36,30 @@
             size_hint_y: None
             height: 40
 
-        BoxLayout:
+        MDBoxLayout:
             size_hint_y: None
             height: 40
-            Button:
+            MDRaisedButton:
                 text: "Show Solution"
                 on_release: root.show_solution()  # Show the PAO details
 
-        BoxLayout:
+        MDBoxLayout:
             size_hint_y: None
             height: 40
-            Button:
+            MDRaisedButton:
                 text: "Right"
                 on_release: root.record_response('right')
-            Button:
+            MDRaisedButton:
                 text: "Wrong"
                 on_release: root.record_response('wrong')
-            Button:
+            MDRaisedButton:
                 text: "Right but Difficult"
                 on_release: root.record_response('difficult')
 
-        BoxLayout:
+        MDBoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
             height: 40
-            Button:
+            MDRaisedButton:
                 text: "Back"
                 on_release: app.root.current = 'main'

@@ -1,7 +1,7 @@
 import random
 from kivymd.uix.screen import MDScreen
 from siapp.db.database import (
-    get_associations,
+    get_all_associations,
     calculate_retention_index,
     get_element_number,
     update_association,
@@ -35,7 +35,7 @@ class ExerciseScreen(MDScreen):
     def load_associations(self):
         # Load associations ordered by retention index and shuffle them
         self.associations = sorted(
-            get_associations(), key=lambda x: x.retention_index
+            get_all_associations(), key=lambda x: x.retention_index
         )[:20]
         random.shuffle(self.associations)
 

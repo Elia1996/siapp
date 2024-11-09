@@ -30,6 +30,10 @@
             id: export
             text: "Export data"
             on_release: root.export()
+        MDRaisedButton:
+            id: back
+            text: "Back"
+            on_release: app.root.current = "main"
         MDBoxLayout:
             orientation: 'vertical'
             MDBoxLayout:

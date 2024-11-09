@@ -1,65 +1,101 @@
+<MyLabelBox>:
+    orientation: "vertical"
+    padding: [dp(5), dp(5), dp(5), dp(5)]
+
+    # Title label positioned above and outside of the main canvas box
+    MDLabel:
+        text: root.title_text
+        font_size: sp(15)
+        halign: "left"
+        valign: "top"
+        size_hint_y: None
+        height: dp(20)
+        pos_hint: {"x": 0, "top": 1}
+
+    # Main content box with rounded corners
+    MDBoxLayout:
+        canvas.before:
+            Color:
+                rgba: root.box_color
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [0, 15, 0, 15]
+
+        MDLabel:
+            text: root.main_text
+            text_color: 0, 0, 0, 1
+            bold: True
+            halign: "center"
+            valign: "center"
+            theme_text_color: "Custom"
+            opacity: root.main_text_opacity  # Control visibility with a property
+
 <ExerciseScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        spacing: 20
+        spacing: 5
         padding: 50
 
-        MDLabel:
+        # https://rgbcolorpicker.com/0-1
+        MyLabelBox:
             id: information_label
-            text: "Information"
-            font_size: 24
-            size_hint_y: None
-            height: 40
-            opacity: 0  # Initially hidden until user chooses to show
-
-        MDLabel:
+            box_color: 0.0, 0.75, 0.71, 1 # Slate Grey background
+            title_text: "Information"
+            main_text: ""
+            main_text_opacity: "0"
+        
+        MyLabelBox:
             id: character_label
-            text: "Character"
-            font_size: 20
-            opacity: 0  # Initially hidden until user chooses to show
-            size_hint_y: None
-            height: 40
+            box_color: 0.94, 0.52, 0.38, 1  # Turquoise background
+            title_text: "Character"
+            main_text: ""
+            main_text_opacity: "0"
 
-        MDLabel:
+        MyLabelBox:
             id: action_label
-            text: "Action"
-            font_size: 20
-            opacity: 0  # Initially hidden until user chooses to show
-            size_hint_y: None
-            height: 40
+            box_color: 0.98, 0.82, 0.44, 1  # Turquoise background
+            title_text: "Action"
+            main_text: ""
+            main_text_opacity: "0"
 
-        MDLabel:
+        MyLabelBox:
             id: object_label
-            text: "Object"
-            font_size: 20
-            opacity: 0  # Initially hidden until user chooses to show
-            size_hint_y: None
-            height: 40
+            box_color: 0.76, 0.69, 0.91, 1  # Turquoise background
+            title_text: "Object"
+            main_text: ""
+            main_text_opacity: "0"
+
 
         MDBoxLayout:
             size_hint_y: None
-            height: 40
             MDRaisedButton:
+                id: show_solution_button
                 text: "Show Solution"
                 on_release: root.show_solution()  # Show the PAO details
 
         MDBoxLayout:
-            size_hint_y: None
-            height: 40
+            orientation: 'horizontal'
+            padding: 10
+            spacing: 10
             MDRaisedButton:
+                id: right_button
                 text: "Right"
+                disabled: True
                 on_release: root.record_response('right')
             MDRaisedButton:
+                id: wrong_button
                 text: "Wrong"
+                disabled: True
                 on_release: root.record_response('wrong')
             MDRaisedButton:
+                id: difficult_button
                 text: "Right but Difficult"
+                disabled: True
                 on_release: root.record_response('difficult')
 
         MDBoxLayout:
             orientation: 'horizontal'
-            size_hint_y: None
-            height: 40
             MDRaisedButton:
                 text: "Back"
                 on_release: app.root.current = 'main'

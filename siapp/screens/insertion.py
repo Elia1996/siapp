@@ -67,7 +67,10 @@ class InsertionScreen(MDScreen):
             if mean_response_time is None:
                 mean_response_time = "Nan"
             else:
-                mean_response_time = timedelta(seconds=mean_response_time)
+                mean_response_time = timedelta(
+                    seconds=int(mean_response_time), microseconds=0
+                )
+            print(mean_response_time)
             l_data.append(
                 {
                     "information_text": assoc.information,

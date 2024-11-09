@@ -12,24 +12,25 @@
 
     MDLabel:
         text: root.information_text
-        font_size: 10
+        font_size: 15
     MDLabel:
         text: root.character_text
-        font_size: 10
+        font_size: 15
     MDLabel:
         size_hint_x: 2.5
         text: root.action_text
-        font_size: 10
+        font_size: 15
     MDLabel:    
         size_hint_x: 1.5
         text: root.object_text
-        font_size: 10
+        font_size: 15
     MDLabel:
         text: root.response_time
-        font_size: 10
+        font_size: 15
     MDRaisedButton:
         size_hint_x: 0.1
-        pos_hint: {"center_x": 0.5}
+        size_hint_y: 0.5
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
         text_color: app.theme_cls.primary_color
         on_release: root.edit_association(root.association_id)
 
@@ -141,30 +142,30 @@
                 orientation: 'horizontal'
                 MDLabel:
                     text: "Informazione"
-                    font_size: 10
+                    font_size: 15
                     bold: True
                 MDLabel:
                     text: "Personaggio"
-                    font_size: 10
+                    font_size: 15
                     bold: True
                 MDLabel:
                     size_hint_x: 2.5
-                    font_size: 10
+                    font_size: 15
                     text: "Azione"
                     bold: True
                 MDLabel:
                     size_hint_x: 1.5
-                    font_size: 10
+                    font_size: 15
                     text: "Oggetto"
                     bold: True
                 MDLabel:
                     text: "Tempo di Risposta"
-                    font_size: 10
+                    font_size: 15
                     bold: True
                 MDLabel:
                     text: "Edit"
                     size_hint_x: 0.6
-                    font_size: 10
+                    font_size: 15
                     bold: True
 
             RecycleView:

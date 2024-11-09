@@ -20,6 +20,19 @@ class FlashcardDirection(Enum):
 
 Builder.load_file("siapp/screens/exercise.kv")
 
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivy.properties import StringProperty, ListProperty
+
+
+class MyLabelBox(MDBoxLayout):
+    title_text = StringProperty("Character")
+    main_text = StringProperty("Character")
+    main_text_opacity = StringProperty("0")
+    box_color = ListProperty([1, 1, 1, 1])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class ExerciseScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -76,32 +89,32 @@ class ExerciseScreen(MDScreen):
         assoc = self.current_association
         if assoc is None:
             return
-        self.ids.information_label.opacity = 0
-        self.ids.character_label.opacity = 0
-        self.ids.action_label.opacity = 0
-        self.ids.object_label.opacity = 0
-        self.ids.information_label.text = f"Information: {assoc.information}"
-        self.ids.character_label.text = f"Character: {assoc.character_text}"
-        self.ids.action_label.text = f"Action: {assoc.action_text}"
-        self.ids.object_label.text = f"Object: {assoc.object_text}"
+        self.ids.information_label.main_text_opacity = "0"
+        self.ids.character_label.main_text_opacity = "0"
+        self.ids.action_label.main_text_opacity = "0"
+        self.ids.object_label.main_text_opacity = "0"
+        self.ids.information_label.main_text = f"{assoc.information}"
+        self.ids.character_label.main_text = f"{assoc.character_text}"
+        self.ids.action_label.main_text = f"{assoc.action_text}"
+        self.ids.object_label.main_text = f"{assoc.object_text}"
         if self.bl_direction == FlashcardDirection.I_TO_PAO:
-            self.ids.information_label.opacity = 1
+            self.ids.information_label.main_text_opacity = "1"
         elif self.bl_direction == FlashcardDirection.P_TO_I:
-            self.ids.character_label.opacity = 1
+            self.ids.character_label.main_text_opacity = "1"
         elif self.bl_direction == FlashcardDirection.A_TO_I:
-            self.ids.action_label.opacity = 1
+            self.ids.action_label.main_text_opacity = "1"
         elif self.bl_direction == FlashcardDirection.O_TO_I:
-            self.ids.object_label.opacity = 1
+            self.ids.object_label.main_text_opacity = "1"
 
     def show_solution(self):
         # Make the PAO visible to the user
         if self.current_association is None:
             return
         self._end_time = datetime.now()
-        self.ids.information_label.opacity = 1
-        self.ids.character_label.opacity = 1
-        self.ids.action_label.opacity = 1
-        self.ids.object_label.opacity = 1
+        self.ids.information_label.main_text_opacity = "1"
+        self.ids.character_label.main_text_opacity = "1"
+        self.ids.action_label.main_text_opacity = "1"
+        self.ids.object_label.main_text_opacity = "1"
         elapsed_time = self._end_time - self._start_time
         elapsed_time = elapsed_time.total_seconds()
         if self.bl_direction == FlashcardDirection.I_TO_PAO:
@@ -114,6 +127,10 @@ class ExerciseScreen(MDScreen):
             self.current_association.last_response_time_O_to_I = elapsed_time
         self.current_association.refresh_count += 1
         self.current_association.last_repetition_date = datetime.now()
+        self.ids.right_button.disabled = False
+        self.ids.wrong_button.disabled = False
+        self.ids.difficult_button.disabled = False
+        self.ids.show_solution_button.disabled = True
 
     def record_response(self, response_type):
         # Record the user’s response (right, wrong, or difficult)
@@ -129,8 +146,12 @@ class ExerciseScreen(MDScreen):
         elif response_type == "difficult":
             self.current_association.difficulty += 0.5
         update_association(self.current_association)
-        self.ids.information_label.opacity = 0
-        self.ids.character_label.opacity = 0
-        self.ids.action_label.opacity = 0
-        self.ids.object_label.opacity = 0
+        self.ids.information_label.main_text_opacity = "0"
+        self.ids.character_label.main_text_opacity = "0"
+        self.ids.action_label.main_text_opacity = "0"
+        self.ids.object_label.main_text_opacity = "0"
+        self.ids.show_solution_button.disabled = False
+        self.ids.right_button.disabled = True
+        self.ids.wrong_button.disabled = True
+        self.ids.difficult_button.disabled = True
         self.next_association()  # Move to the next association

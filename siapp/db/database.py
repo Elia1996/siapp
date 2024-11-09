@@ -63,6 +63,7 @@ def get_mean_response_time(assoc: Association) -> Optional[float]:
         )
         response_times = cursor.fetchone()
         response_times = [t for t in response_times if t is not None]
+        print(response_times)
         if response_times:
             return sum(response_times) / len(response_times)
         return None

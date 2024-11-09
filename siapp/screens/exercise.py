@@ -1,4 +1,5 @@
 import random
+from typing import Optional
 from kivymd.uix.screen import MDScreen
 from siapp.db.database import (
     get_all_associations,
@@ -84,6 +85,32 @@ class ExerciseScreen(MDScreen):
             ret = self.choose_direction()
             self.display_association()
 
+    def remove_information_card(self):
+        # Remove the character card from the flashcard
+        self.ids.information_image_card.opacity = 0
+
+    def remove_pao_card(self):
+        # Remove the PAO card from the flashcard
+        self.ids.pao_image_card.opacity = 0
+
+    def add_information_image(self, image: Optional[bytes]):
+        # Add the infromation image to the flashcard
+        card = self.ids.information_image_card
+        if image is None:
+            card.opacity = 0
+        else:
+            card.opacity = 1
+            self.ids.information_image.source = image
+
+    def add_pao_images(self, image: Optional[bytes]):
+        # Add the PAO image to the flashcard
+        card = self.ids.pao_image_card
+        if image is None:
+            card.opacity = 0
+        else:
+            card.opacity = 1
+            self.ids.pao_image.source = image
+
     def display_association(self):
         # Display the information to be memorized and hide the PAO (Character, Action, Object)
         assoc = self.current_association
@@ -93,18 +120,26 @@ class ExerciseScreen(MDScreen):
         self.ids.character_label.main_text_opacity = "0"
         self.ids.action_label.main_text_opacity = "0"
         self.ids.object_label.main_text_opacity = "0"
+        self.ids.information_image_card.opacity = 0
+        self.ids.pao_image_card.opacity = 0
         self.ids.information_label.main_text = f"{assoc.information}"
         self.ids.character_label.main_text = f"{assoc.character_text}"
         self.ids.action_label.main_text = f"{assoc.action_text}"
         self.ids.object_label.main_text = f"{assoc.object_text}"
         if self.bl_direction == FlashcardDirection.I_TO_PAO:
             self.ids.information_label.main_text_opacity = "1"
+            self.add_information_image(
+                self.current_association.information_image
+            )
         elif self.bl_direction == FlashcardDirection.P_TO_I:
             self.ids.character_label.main_text_opacity = "1"
+            self.add_pao_images(self.current_association.pao_image)
         elif self.bl_direction == FlashcardDirection.A_TO_I:
             self.ids.action_label.main_text_opacity = "1"
+            self.add_pao_images(self.current_association.pao_image)
         elif self.bl_direction == FlashcardDirection.O_TO_I:
             self.ids.object_label.main_text_opacity = "1"
+            self.add_pao_images(self.current_association.pao_image)
 
     def show_solution(self):
         # Make the PAO visible to the user
@@ -115,6 +150,8 @@ class ExerciseScreen(MDScreen):
         self.ids.character_label.main_text_opacity = "1"
         self.ids.action_label.main_text_opacity = "1"
         self.ids.object_label.main_text_opacity = "1"
+        self.add_information_image(self.current_association.information_image)
+        self.add_pao_images(self.current_association.pao_image)
         elapsed_time = self._end_time - self._start_time
         elapsed_time = elapsed_time.total_seconds()
         if self.bl_direction == FlashcardDirection.I_TO_PAO:
@@ -150,6 +187,8 @@ class ExerciseScreen(MDScreen):
         self.ids.character_label.main_text_opacity = "0"
         self.ids.action_label.main_text_opacity = "0"
         self.ids.object_label.main_text_opacity = "0"
+        self.remove_information_card()
+        self.remove_pao_card()
         self.ids.show_solution_button.disabled = False
         self.ids.right_button.disabled = True
         self.ids.wrong_button.disabled = True

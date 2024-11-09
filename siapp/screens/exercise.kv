@@ -1,6 +1,6 @@
 <MyLabelBox>:
     orientation: "vertical"
-    padding: [dp(5), dp(5), dp(5), dp(5)]
+    padding: [dp(0), dp(5), dp(0), dp(5)]
 
     # Title label positioned above and outside of the main canvas box
     MDLabel:
@@ -20,7 +20,7 @@
             RoundedRectangle:
                 pos: self.pos
                 size: self.size
-                radius: [0, 15, 0, 15]
+                radius: [0, 20, 0, 20]
 
         MDLabel:
             text: root.main_text
@@ -33,9 +33,10 @@
 
 <ExerciseScreen>:
     MDBoxLayout:
+        id: container
         orientation: 'vertical'
         spacing: 5
-        padding: 50
+        padding: 10
 
         # https://rgbcolorpicker.com/0-1
         MyLabelBox:
@@ -44,6 +45,20 @@
             title_text: "Information"
             main_text: ""
             main_text_opacity: "0"
+        
+        MDBoxLayout:
+            id: container_information
+            orientation: 'vertical'
+            MDCard:
+                id: information_image_card
+                orientation: 'vertical'
+                size_hint_y: 2
+                Image:
+                    id: information_image
+                    source: ""
+                    size_hint_y: 2
+                    allow_stretch: True
+                    keep_ratio: True
         
         MyLabelBox:
             id: character_label
@@ -65,18 +80,33 @@
             title_text: "Object"
             main_text: ""
             main_text_opacity: "0"
-
+       
+        MDBoxLayout:
+            id: container_pao
+            orientation: 'vertical'
+            MDCard:
+                id: pao_image_card
+                orientation: 'vertical'
+                size_hint_y: 2
+                Image:
+                    id: pao_image
+                    source: ""
+                    size_hint_y: 2
+                    allow_stretch: True
+                    keep_ratio: True
 
         MDBoxLayout:
-            size_hint_y: None
+            size_hint_y: 0.5
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
             MDRaisedButton:
                 id: show_solution_button
                 text: "Show Solution"
                 on_release: root.show_solution()  # Show the PAO details
 
         MDBoxLayout:
+            size_hint_y: 0.5
             orientation: 'horizontal'
-            padding: 10
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
             spacing: 10
             MDRaisedButton:
                 id: right_button
@@ -95,6 +125,8 @@
                 on_release: root.record_response('difficult')
 
         MDBoxLayout:
+            size_hint_y: 0.5
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
             orientation: 'horizontal'
             MDRaisedButton:
                 text: "Back"

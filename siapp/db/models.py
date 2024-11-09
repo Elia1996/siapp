@@ -228,4 +228,17 @@ def create_tables():
     conn.close()
 
 
-create_tables()
+# Check if the database is created, if yes don't create it again
+def check_database():
+    try:
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Association")
+            cursor.execute("SELECT * FROM WorkDay")
+            cursor.execute("SELECT * FROM WorkLog")
+        conn.close()
+    except sqlite3.OperationalError:
+        create_tables()
+
+
+check_database()

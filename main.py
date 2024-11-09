@@ -1,10 +1,10 @@
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 from kivy.lang import Builder
-from screens.main_menu import MainMenuScreen
-from screens.insertion import InsertionScreen
-from screens.exercise import ExerciseScreen
-from screens.hourslog import HoursLogScreen
+from siapp.screens.main_menu import MainMenuScreen
+from siapp.screens.insertion import InsertionScreen
+from siapp.screens.exercise import ExerciseScreen
+from siapp.screens.hourslog import HoursLogScreen
 
 
 class MemoryApp(MDApp):
@@ -16,7 +16,7 @@ class MemoryApp(MDApp):
         'LightGreen', 'Lime', 'Yellow', 'Amber', 'Orange',
         'DeepOrange', 'Brown', 'Gray', 'BlueGray']"""
         self.theme_cls.primary_palette = "LightBlue"
-        Builder.load_file("screens/main_menu.kv")
+        Builder.load_file("siapp/screens/main_menu.kv")
         sm = ScreenManager()
         sm.add_widget(MainMenuScreen(name="main"))
         sm.add_widget(InsertionScreen(name="insertion"))

@@ -12,7 +12,7 @@ from siapp.db.database import (
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
 
-Builder.load_file("screens/insertion.kv")
+Builder.load_file("siapp/screens/insertion.kv")
 
 
 class InsertionScreen(MDScreen):

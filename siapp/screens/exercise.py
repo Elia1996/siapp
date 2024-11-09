@@ -18,7 +18,7 @@ class FlashcardDirection(Enum):
     O_TO_I = 4
 
 
-Builder.load_file("screens/exercise.kv")
+Builder.load_file("siapp/screens/exercise.kv")
 
 
 class ExerciseScreen(MDScreen):

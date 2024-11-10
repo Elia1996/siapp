@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 kivy = "^2.3.0"
 kivymd = "^1.2.0"
+pyjnius = "^1.6.1"
 
 
 [tool.poetry.group.dev.dependencies]

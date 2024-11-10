@@ -232,6 +232,7 @@ def create_tables():
 
 # Check if the database is created, if yes don't create it again
 def create_database():
+    global DATABASE
     # Database file
     if platform == "android":
         DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"

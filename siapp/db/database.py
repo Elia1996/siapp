@@ -63,7 +63,6 @@ def get_mean_response_time(assoc: Association) -> Optional[float]:
         )
         response_times = cursor.fetchone()
         response_times = [t for t in response_times if t is not None]
-        print(response_times)
         if response_times:
             return sum(response_times) / len(response_times)
         return None
@@ -235,6 +234,55 @@ def set_work_log(check_in: bool, time: datetime):
         conn.commit()
 
 
+def get_worked_hours_today() -> timedelta:
+    today = (
+        datetime.now()
+        .replace(hour=0, minute=0, second=0, microsecond=0)
+        .isoformat()
+    )
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM WorkDay WHERE date=?", (today,))
+        work_day_id = cursor.fetchone()
+
+        if work_day_id is None:
+            return timedelta(0)
+
+        work_day_id = work_day_id[0]
+        # Fetch all work logs for the day
+        cursor.execute(
+            "SELECT timestamp, check_in FROM WorkLog WHERE workday_id=?",
+            (work_day_id,),
+        )
+        work_logs = cursor.fetchall()
+        # Find the last check-in time
+        time_of_work = timedelta(0)
+        lunch_break = timedelta(0)
+        work_break = timedelta(0)
+        last_check_in = None
+        len_work_logs = len(work_logs)
+        if len_work_logs % 2 != 0:
+            len_work_logs -= 1
+            last_check_in = datetime.fromisoformat(work_logs[-1][0])
+        for i in range(0, len_work_logs, 2):
+            start_time = datetime.fromisoformat(work_logs[i][0])
+            end_time = datetime.fromisoformat(work_logs[i + 1][0])
+            time_of_work += end_time - start_time
+
+            if i > 0:
+                prev_end_time = datetime.fromisoformat(work_logs[i - 1][0])
+                if 11 <= prev_end_time.hour <= 14:
+                    lunch_break += start_time - prev_end_time
+                else:
+                    work_break += start_time - prev_end_time
+
+    # Convert time worked to hours:minutes:seconds format
+    if last_check_in is not None:
+        time_of_work += datetime.now() - last_check_in
+    time_of_work = str(time_of_work).split(".")[0]
+    return time_of_work
+
+
 def analyze_hours():
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -291,10 +339,10 @@ def get_data_summary():
         work_days = cursor.fetchall()
         return [
             {
-                "date": wd[0],
-                "work_time": wd[1],
-                "lunch_break": wd[2],
-                "work_break": wd[3],
+                "date": wd[0].split("T")[0],
+                "work_time": wd[1].split(".")[0],
+                "lunch_break": wd[2].split(".")[0],
+                "work_break": wd[3].split(".")[0],
             }
             for wd in work_days
         ]

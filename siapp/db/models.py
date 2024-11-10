@@ -1,8 +1,15 @@
 import sqlite3
 from datetime import datetime, timedelta
 from typing import Optional, List
+from kivy.utils import platform
+from kivy.app import App
 
-DATABASE = "memory_app.db"
+
+# Database file
+if platform == "android":
+    DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
+else:
+    DATABASE = "memory_app.db"
 
 
 class Association:

@@ -6,19 +6,33 @@ from siapp.db.database import (
     analyze_hours,
     get_data_summary,
     save_exported_data,
+    get_worked_hours_today,
 )
 from kivymd.uix.filemanager import (
     MDFileManager,
 )  # Usa MDFileManager al posto di FileChooserIconView
 from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
+from kivy.clock import Clock
+from kivy.properties import StringProperty, ListProperty
+from kivymd.uix.boxlayout import MDBoxLayout
 
 Builder.load_file("siapp/screens/hourslog.kv")
 
 
+class MyLabelBox(MDBoxLayout):
+    title_text = StringProperty("")
+    main_text = StringProperty("")
+    main_text_opacity = StringProperty("0")
+    box_color = ListProperty([1, 1, 1, 1])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 class HoursLogScreen(MDScreen):
-    loggedin = (1, 0, 0, 1)
-    loggedout = (0, 1, 0, 1)
+    loggedin = (0.745, 0, 0, 1)
+    loggedout = (0, 0.745, 0, 1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -53,6 +67,12 @@ class HoursLogScreen(MDScreen):
         else:
             self.ids.hourslog.text = "You are Logged Out"
             self.ids.hourslog.md_bg_color = self.loggedout
+        self.update_summary_list()
+        Clock.schedule_interval(self.update_worked_hours_today, 1)
+
+    def update_worked_hours_today(self, dt):
+        worked_hours = str(get_worked_hours_today())
+        self.ids.worked_hours_today.main_text = worked_hours
 
     def add_log(self, button):
         # Check the current state and toggle text and color
@@ -69,7 +89,6 @@ class HoursLogScreen(MDScreen):
 
     def update_summary_list(self):
         l_data = get_data_summary()
-        print(l_data)
         self.ids.hours_summary.data = l_data
 
     def export(self):

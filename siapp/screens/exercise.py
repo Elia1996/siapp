@@ -25,16 +25,6 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.properties import StringProperty, ListProperty
 
 
-class MyLabelBox(MDBoxLayout):
-    title_text = StringProperty("Character")
-    main_text = StringProperty("Character")
-    main_text_opacity = StringProperty("0")
-    box_color = ListProperty([1, 1, 1, 1])
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
 class ExerciseScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

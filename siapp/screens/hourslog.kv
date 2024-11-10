@@ -23,34 +23,67 @@
         padding: 20
         spacing: 20
         orientation: 'vertical'
-        MDRaisedButton:
-            id: hourslog
-            text: "You are Logged Out"
-            md_bg_color: (0, 1, 0, 1)
-            on_release: root.add_log(self)
-        MDRaisedButton:
-            id: export
-            text: "Export data"
-            on_release: root.export()
-        MDRaisedButton:
-            id: back
-            text: "Back"
-            on_release: app.root.current = "main"
+        MDBoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            spacing: 20
+            MDRaisedButton:
+                id: hourslog
+                text: "You are Logged Out"
+                md_bg_color: (0, 1, 0, 1)
+                on_release: root.add_log(self)
+            MyLabelBox:
+                id: worked_hours_today
+                box_color: 0.0, 0.75, 0.71, 1
+                title_text: "Worked Hours Today"
+                main_text: ""
+                main_text_opacity: "1"
+        MDBoxLayout:
+            size_hint_y: 0.1
+            spacing: 20
+            orientation: 'horizontal'
+            MDRaisedButton:
+                id: export
+                text: "Export data"
+                on_release: root.export()
+            MDRaisedButton:
+                id: back
+                text: "Back"
+                on_release: app.root.current = "main"
+
+        # Horizontal Divider Line
+        BoxLayout:
+            size_hint_y: None
+            height: 2  # Set the height of the line
+            canvas.before:
+                Color:
+                    rgba: app.theme_cls.primary_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
         MDBoxLayout:
             orientation: 'vertical'
             MDBoxLayout:
-                size_hint_y: 0.3
+                size_hint_y: 0.06
                 orientation: 'horizontal'
                 MDLabel:
+                    valign: "center"
+                    halign: "left"
                     text: "Date"
                     bold: True
                 MDLabel:
+                    valign: "center"
+                    halign: "left"
                     text: "Work Time"
                     bold: True
                 MDLabel:
+                    valign: "center"
+                    halign: "left"
                     text: "Lunch Break"
                     bold: True
                 MDLabel:
+                    valign: "center"
+                    halign: "left"
                     text: "Pause"
                     bold: True
 

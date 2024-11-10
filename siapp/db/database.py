@@ -37,7 +37,7 @@ def get_fmanager_path() -> str:
         from android.storage import primary_external_storage_path
 
         storage_base_path = primary_external_storage_path()
-        storage_path = os.path.join(storage_base_path, "Pictures")
+        storage_path = os.path.join(storage_base_path, "Documents")
         if os.path.exists(storage_path) and can_write_to_directory(
             storage_path
         ):

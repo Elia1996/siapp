@@ -6,6 +6,7 @@ from siapp.db.database import (
     analyze_hours,
     get_data_summary,
     save_exported_data,
+    get_fmanager_path,
     get_worked_hours_today,
 )
 from kivymd.uix.filemanager import (
@@ -44,9 +45,7 @@ class HoursLogScreen(MDScreen):
 
     def open_file_manager_exporter(self):
         # Open file manager at the default directory or a specific one
-        self.file_manager.show(
-            os.path.expanduser("~")
-        )  # Opens at the home directory
+        self.file_manager.show(get_fmanager_path())
 
     def select_path(self, path):
         # Here you get the selected folder path

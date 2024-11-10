@@ -4,11 +4,48 @@ from typing import Optional, List
 import sqlite3
 from siapp.db.models import Association
 import csv
+from kivy.utils import platform
+import os
 
 
 def image_path_to_bytes(image_path: str) -> bytes:
     with open(image_path, "rb") as file:
         return file.read()
+
+
+def can_write_to_directory(path):
+    test_file = os.path.join(path, "temp_test_file.tmp")
+    try:
+        # Try creating a temporary file to test write access
+        with open(test_file, "w") as f:
+            f.write("test")
+        os.remove(
+            test_file
+        )  # Clean up the test file if it was created successfully
+        return True
+    except (IOError, OSError):
+        # If an error occurs, write access is likely restricted
+        return False
+
+
+def get_fmanager_path() -> str:
+    # Try different paths to open the file manger in an existing directory
+    if platform == "android":
+        from android.storage import primary_external_storage_path
+        import os
+
+        storage_path = primary_external_storage_path()
+        os.path.join(storage_path, "Pictures")
+        if os.path.exists(storage_path) and can_write_to_directory(
+            storage_path
+        ):
+            return storage_path
+        storage_path = "/storage/emulated/0"
+        if os.path.exists(storage_path) and can_write_to_directory(
+            storage_path
+        ):
+            return storage_path
+    return "/"
 
 
 def add_association(

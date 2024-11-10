@@ -123,11 +123,3 @@
                 text: "Right but Difficult"
                 disabled: True
                 on_release: root.record_response('difficult')
-
-        MDBoxLayout:
-            size_hint_y: 0.5
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            orientation: 'horizontal'
-            MDRaisedButton:
-                text: "Back"
-                on_release: app.root.current = 'main'

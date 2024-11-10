@@ -9,6 +9,7 @@ from kivy.core.text import Label as CoreLabel
 from siapp.db.database import (
     add_association,
     get_all_associations,
+    get_fmanager_path,
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
 from siapp.db.models import create_database
@@ -124,7 +125,7 @@ class InsertionScreen(MDScreen):
         """
         self._image_type = image_type
         self.file_manager.show(
-            "/"
+            get_fmanager_path()
         )  # Opens file manager at root or specific path
 
     def close_filechooser(self, *args):

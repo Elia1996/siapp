@@ -32,7 +32,6 @@ class MyLabelBox(MDBoxLayout):
 
 class HoursLogScreen(MDScreen):
     loggedin = (0.745, 0, 0, 1)
-    loggedout = (0, 0.745, 0, 1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -66,7 +65,7 @@ class HoursLogScreen(MDScreen):
             self.ids.hourslog.md_bg_color = self.loggedin
         else:
             self.ids.hourslog.text = "You are Logged Out"
-            self.ids.hourslog.md_bg_color = self.loggedout
+            self.ids.hourslog.md_bg_color = self.theme_cls.primary_color
         self.update_summary_list()
         Clock.schedule_interval(self.update_worked_hours_today, 1)
 
@@ -78,7 +77,7 @@ class HoursLogScreen(MDScreen):
         # Check the current state and toggle text and color
         if button.text == "You are Logged In":
             button.text = "You are Logged Out"
-            button.md_bg_color = self.loggedout
+            button.md_bg_color = self.theme_cls.primary_color
             set_work_log(False, datetime.now())
         else:
             button.text = "You are Logged In"

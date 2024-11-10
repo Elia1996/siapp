@@ -1,5 +1,97 @@
-ScreenManager:
-    MainMenuScreen:
-    InsertionScreen:
-    ExerciseScreen:
-    HoursLog:
+<DrawerClickableItem@MDNavigationDrawerItem>
+    focus_color: "#e7e4c0"
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    ripple_color: "#c5bdd2"
+    selected_color: "#0c6c4d"
+
+
+<DrawerLabelItem@MDNavigationDrawerItem>
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    focus_behavior: False
+    selected_color: "#4a4939"
+    _no_ripple_effect: True
+
+
+BoxLayout:
+    orientation: 'vertical'
+
+    MDTopAppBar:
+        title: "SIApp"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+        elevation: 10
+
+    MDNavigationLayout:
+        ScreenManager:
+            id: screen_manager
+
+            MainPageScreen:
+                name: "main_page"
+
+            InsertionScreen:
+                name: "insertion"
+
+            ExerciseScreen:
+                name: "exercise"
+
+            HoursLogScreen:
+                name: "hourslog"
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            radius: (0, dp(16), dp(16), 0)
+
+            MDNavigationDrawerMenu:
+
+                MDNavigationDrawerHeader:
+                    title: "SIApp"
+                    title_color: "#4a4939"
+                    text: "Your Self Improvement App"
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+                MDNavigationDrawerLabel:
+                    text: "Navigation"
+                
+                DrawerClickableItem:
+                    icon: "clock-outline"
+                    text: "Hours Log"
+                    on_release:
+                        screen_manager.current = "hourslog"
+                        nav_drawer.set_state("close")
+
+
+                DrawerClickableItem:
+                    icon: "home"
+                    text: "Main Page"
+                    on_release:
+                        screen_manager.current = "main_page"
+                        nav_drawer.set_state("close")
+
+                DrawerClickableItem:
+                    icon: "plus-circle"
+                    text: "Insertion"
+                    on_release:
+                        screen_manager.current = "insertion"
+                        nav_drawer.set_state("close")
+
+                DrawerClickableItem:
+                    icon: "brain"
+                    text: "Exercise"
+                    on_release:
+                        screen_manager.current = "exercise"
+                        nav_drawer.set_state("close")
+
+                MDNavigationDrawerDivider:
+
+                MDNavigationDrawerLabel:
+                    text: "Info"
+
+                DrawerLabelItem:
+                    icon: "information-outline"
+                    text: "About Us"
+
+                DrawerLabelItem:
+                    icon: "help-circle-outline"
+                    text: "Help"

@@ -14,10 +14,11 @@
         text: root.information_text
         font_size: 15
     MDLabel:
+        size_hint_x: 1.5
         text: root.character_text
         font_size: 15
     MDLabel:
-        size_hint_x: 2.5
+        size_hint_x: 1.5
         text: root.action_text
         font_size: 15
     MDLabel:    
@@ -124,10 +125,6 @@
                     md_bg_color: app.theme_cls.primary_color
                     on_release: root.save_association(information.text, character.text, action.text, object.text, information_image.source, pao_image.source)
 
-                MDRaisedButton:
-                    text: "Indietro"
-                    md_bg_color: app.theme_cls.primary_color
-                    on_release: app.root.current = 'main'
         MDBoxLayout:
             orientation: 'vertical'
             #canvas.before:
@@ -145,11 +142,12 @@
                     font_size: 15
                     bold: True
                 MDLabel:
+                    size_hint_x: 1.5
                     text: "Personaggio"
                     font_size: 15
                     bold: True
                 MDLabel:
-                    size_hint_x: 2.5
+                    size_hint_x: 1.5
                     font_size: 15
                     text: "Azione"
                     bold: True

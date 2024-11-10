@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, List
 import sqlite3
-from siapp.db.models import Association, DATABASE
+from siapp.db.models import Association
 import csv
 
 
@@ -19,6 +19,8 @@ def add_association(
     action_text: Optional[str] = None,
     object_text: Optional[str] = None,
 ):
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -43,6 +45,8 @@ def add_association(
 
 
 def get_element_number() -> int:
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM Association")
@@ -51,6 +55,8 @@ def get_element_number() -> int:
 
 def get_mean_response_time(assoc: Association) -> Optional[float]:
     association_id = assoc.id
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -70,6 +76,8 @@ def get_mean_response_time(assoc: Association) -> Optional[float]:
 
 def calculate_retention_index():
     now = datetime.now()
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
 
@@ -142,6 +150,8 @@ def current_state() -> bool:
     """Determines the current state based on the most recent work log entry.
     Returns True if the last log entry is a check-in, False if it is a check-out or no logs are found.
     """
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
 
@@ -191,6 +201,8 @@ def fetchall_to_associations(fetchall: List[tuple]) -> List[Association]:
 
 
 def get_all_associations() -> List[Association]:
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Association")
@@ -202,6 +214,8 @@ def get_all_associations() -> List[Association]:
 def update_association(ass: Association):
     association_id = ass.id
     d_modified = ass.get_modified_dict()
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         columns = ", ".join([f"{k} = ?" for k in d_modified])
@@ -213,6 +227,8 @@ def update_association(ass: Association):
 # Funzioni per i log di lavoro
 def set_work_log(check_in: bool, time: datetime):
     today = time.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM WorkDay WHERE date=?", (today,))
@@ -240,6 +256,8 @@ def get_worked_hours_today() -> timedelta:
         .replace(hour=0, minute=0, second=0, microsecond=0)
         .isoformat()
     )
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM WorkDay WHERE date=?", (today,))
@@ -284,6 +302,8 @@ def get_worked_hours_today() -> timedelta:
 
 
 def analyze_hours():
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT id, date FROM WorkDay")
@@ -331,6 +351,8 @@ def analyze_hours():
 
 
 def get_data_summary():
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -350,6 +372,8 @@ def get_data_summary():
 
 def get_export_data() -> list:
     """Fetch workday and work log data, structure it as a list of dictionaries for CSV export."""
+    from siapp.db.models import DATABASE
+
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
 

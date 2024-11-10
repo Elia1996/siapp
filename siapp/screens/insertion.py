@@ -11,6 +11,7 @@ from siapp.db.database import (
     get_all_associations,
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
+from siapp.db.models import create_database
 
 Builder.load_file("siapp/screens/insertion.kv")
 
@@ -22,6 +23,8 @@ class InsertionScreen(MDScreen):
         self.file_manager = MDFileManager(
             exit_manager=self.close_filechooser, select_path=self.load_image
         )
+
+    def on_enter(self):
         self.refresh_association_list()
 
     def save_association(
@@ -70,7 +73,6 @@ class InsertionScreen(MDScreen):
                 mean_response_time = timedelta(
                     seconds=int(mean_response_time), microseconds=0
                 )
-            print(mean_response_time)
             l_data.append(
                 {
                     "information_text": assoc.information,

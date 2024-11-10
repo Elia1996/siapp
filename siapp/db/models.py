@@ -4,12 +4,7 @@ from typing import Optional, List
 from kivy.utils import platform
 from kivy.app import App
 
-
-# Database file
-if platform == "android":
-    DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
-else:
-    DATABASE = "memory_app.db"
+DATABASE = None
 
 
 class Association:
@@ -236,7 +231,14 @@ def create_tables():
 
 
 # Check if the database is created, if yes don't create it again
-def check_database():
+def create_database():
+    global DATABASE
+    # Database file
+    if platform == "android":
+        DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
+    else:
+        DATABASE = "memory_app.db"
+
     try:
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
@@ -246,6 +248,3 @@ def check_database():
         conn.close()
     except sqlite3.OperationalError:
         create_tables()
-
-
-check_database()

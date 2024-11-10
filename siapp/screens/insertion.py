@@ -25,7 +25,9 @@ class InsertionScreen(MDScreen):
             exit_manager=self.close_filechooser,
             select_path=self.load_image,
             selector="file",
+            sort_by="date",
         )
+        self.file_manager.ext = [".png", ".jpg", ".jpeg"]
 
     def on_enter(self):
         self.refresh_association_list()

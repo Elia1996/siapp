@@ -465,17 +465,12 @@ def save_exported_data(output_folder: Path):
     """Export the work data to a CSV file in the specified output folder."""
     data = get_export_data()
     filename = Path("HoursLog.csv")
+    output_file = Path(output_folder) / filename.name
 
     # Write data to CSV
-    with open(filename, mode="w", newline="") as file:
+    with open(output_file, mode="w", newline="") as file:
         # Dynamically get field names from the data to handle varying keys (e.g., different "in/out" columns)
         fieldnames = {key for row in data for key in row.keys()}
         writer = csv.DictWriter(file, fieldnames=sorted(fieldnames))
         writer.writeheader()
         writer.writerows(data)
-
-    # Move the CSV file to the specified output folder
-    output_file = Path(output_folder) / filename.name
-    if output_file.exists():
-        output_file.unlink()  # Remove if a file with the same name exists
-    filename.rename(output_file)

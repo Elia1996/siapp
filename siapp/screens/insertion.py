@@ -22,7 +22,9 @@ class InsertionScreen(MDScreen):
         super().__init__(**kwargs)
         self._image_type = None
         self.file_manager = MDFileManager(
-            exit_manager=self.close_filechooser, select_path=self.load_image
+            exit_manager=self.close_filechooser,
+            select_path=self.load_image,
+            selector="file",
         )
 
     def on_enter(self):

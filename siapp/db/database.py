@@ -30,25 +30,31 @@ def can_write_to_directory(path):
 
 def get_fmanager_path() -> str:
     # Try different paths to open the file manger in an existing directory
+    print("Platform:", platform)
+    import os
+
     if platform == "android":
         from android.storage import primary_external_storage_path
-        import os
 
         storage_base_path = primary_external_storage_path()
         storage_path = os.path.join(storage_base_path, "Pictures")
         if os.path.exists(storage_path) and can_write_to_directory(
             storage_path
         ):
+            print("Opening in:", storage_path)
             return storage_path
         if os.path.exists(storage_base_path) and can_write_to_directory(
             storage_base_path
         ):
+            print("Opening in:", storage_base_path)
             return storage_base_path
         storage_path = "/storage/emulated/0"
         if os.path.exists(storage_path) and can_write_to_directory(
             storage_path
         ):
+            print("Opening in:", storage_path)
             return storage_path
+    print("Opening in:", os.path.expanduser("~"))
     return "/"
 
 

@@ -267,7 +267,9 @@ def update_association(ass: Association):
         cursor = conn.cursor()
         columns = ", ".join([f"{k} = ?" for k in d_modified])
         values = list(d_modified.values()) + [association_id]
-        cursor.execute(f"UPDATE Association SET {columns} WHERE id = ?", values)
+        cursor.execute(
+            f"UPDATE Association SET {columns} WHERE id = ?", values
+        )
         conn.commit()
 
 
@@ -363,7 +365,6 @@ def analyze_hours():
                 (work_day_id,),
             )
             work_logs = cursor.fetchall()
-
             time_of_work = timedelta(0)
             lunch_break = timedelta(0)
             work_break = timedelta(0)
@@ -398,23 +399,52 @@ def analyze_hours():
 
 
 def get_data_summary():
+    """Fetch workday data and structure it as a list of dictionaries
+    for display.
+
+    Returns:
+        list: A list of dictionaries containing workday data with the following
+            keys: workday_id, date, work_time, lunch_break, work_break.
+            all are strings.
+    """
     from siapp.db.models import DATABASE
+
+    analyze_hours()
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT date, time_of_work, lunch_break, work_break FROM WorkDay"
+            "SELECT date, time_of_work, lunch_break, work_break, id FROM WorkDay"
         )
         work_days = cursor.fetchall()
         return [
             {
-                "date": wd[0].split("T")[0],
-                "work_time": wd[1].split(".")[0],
-                "lunch_break": wd[2].split(".")[0],
-                "work_break": wd[3].split(".")[0],
+                "workday_id": wd[4],
+                "date": wd[0].split("T")[0] if wd[0] else "",
+                "work_time": wd[1].split(".")[0] if wd[1] else "",
+                "lunch_break": wd[2].split(".")[0] if wd[2] else "",
+                "work_break": wd[3].split(".")[0] if wd[3] else "",
             }
             for wd in work_days
         ]
+
+
+def delete_workday_entry(workday_id: int):
+    """Delete a workday entry and its associated work logs from the database."""
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        # GEt the work logs associated with the workday
+        cursor.execute(
+            "SELECT id FROM WorkLog WHERE workday_id=?", (workday_id,)
+        )
+        work_logs = cursor.fetchall()
+        # Delete the work logs
+        for log in work_logs:
+            cursor.execute("DELETE FROM WorkLog WHERE id=?", (log[0],))
+        cursor.execute("DELETE FROM WorkDay WHERE id=?", (workday_id,))
+        conn.commit()
 
 
 def get_export_data() -> list:
@@ -457,6 +487,7 @@ def get_export_data() -> list:
                     d_workday[f"out {i//2 + 1}"] = timestamp
 
             data.append(d_workday)
+            print(d_workday)
 
     return data
 

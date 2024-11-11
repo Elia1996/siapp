@@ -1,5 +1,5 @@
 from datetime import datetime
-import os
+from typing import Literal
 from siapp.db.database import (
     current_state,
     set_work_log,
@@ -8,6 +8,7 @@ from siapp.db.database import (
     save_exported_data,
     get_fmanager_path,
     get_worked_hours_today,
+    delete_workday_entry,
 )
 from kivymd.uix.filemanager import (
     MDFileManager,
@@ -17,6 +18,11 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.properties import StringProperty, ListProperty
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.pickers import (
+    MDDatePicker,
+    MDTimePicker,
+)
 
 Builder.load_file("siapp/screens/hourslog.kv")
 
@@ -42,6 +48,31 @@ class HoursLogScreen(MDScreen):
             preview=False,
         )
         self._excel_output_path = None
+        self.menu = None
+
+    def open_menu(self, root):
+        menu_items = [
+            {
+                "text": "Edit",
+                "on_release": lambda x="edit": self.menu_callback(x, root),
+            },
+            {
+                "text": "Delete",
+                "on_release": lambda x="delete": self.menu_callback(x, root),
+            },
+        ]
+        self.menu = MDDropdownMenu(
+            caller=root.ids.option_button, items=menu_items, width_mult=4
+        )
+        self.menu.open()
+
+    def menu_callback(self, text_item, root):
+        if text_item == "edit":
+            self.menu.dismiss()
+        elif text_item == "delete":
+            delete_workday_entry(root.workday_id)
+            self.update_summary_list()
+            self.menu.dismiss()
 
     def open_file_manager_exporter(self):
         # Open file manager at the default directory or a specific one
@@ -87,7 +118,12 @@ class HoursLogScreen(MDScreen):
 
     def update_summary_list(self):
         l_data = get_data_summary()
-        self.ids.hours_summary.data = l_data
+        l_final_data = []
+        for data in l_data:
+            l_final_data.append(data)
+            l_final_data[-1]["hourslogscreen"] = self
+
+        self.ids.hours_summary.data = l_final_data
 
     def export(self):
         """Export data from db to an excel and ask user where to save it"""
@@ -97,3 +133,50 @@ class HoursLogScreen(MDScreen):
     def export_data(self):
         # Save the data to the selected path
         save_exported_data(self._excel_output_path)
+
+    def add_checkin(self, instance, value):
+        check_out_datetime = datetime.combine(self._new_date, value)
+        print(check_out_datetime)
+        set_work_log(True, check_out_datetime)
+        self.update_summary_list()
+
+    def add_checkout(self, instance, value):
+        # Convert the date and time to a datetime object
+        check_out_datetime = datetime.combine(self._new_date, value)
+        # Save the check out time
+        print(check_out_datetime)
+        set_work_log(False, check_out_datetime)
+        self.update_summary_list()
+
+    def add_checkin_time(self, instance, value, date_range):
+        """Open a dialog to add a checkin"""
+        self._new_date = value
+        time_dialog = MDTimePicker(
+            time=datetime.now().time(),
+        )
+        time_dialog.bind(on_save=self.add_checkin)
+        time_dialog.open()
+
+    def add_checkout_time(self, instance, value, date_range):
+        """Open a dialog to add a checkout"""
+        self._new_date = value
+        time_dialog = MDTimePicker(
+            time=datetime.now().time(),
+        )
+        time_dialog.bind(on_save=self.add_checkout)
+        time_dialog.open()
+
+    def add_check_inout(self, check_inout: Literal["checkin", "checkout"]):
+        """Open a date picker dialog"""
+        on_ok_callback = None
+        if check_inout == "checkin":
+            on_ok_callback = self.add_checkin_time
+        elif check_inout == "checkout":
+            on_ok_callback = self.add_checkout_time
+        date_dialog = MDDatePicker(
+            year=datetime.now().year,
+            month=datetime.now().month,
+            day=datetime.now().day,
+        )
+        date_dialog.bind(on_save=on_ok_callback)
+        return date_dialog.open()

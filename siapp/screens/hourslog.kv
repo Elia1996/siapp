@@ -3,20 +3,38 @@
     work_time: ""
     lunch_break: ""
     work_break: ""
+    workday_id: 0
+    hourslogscreen: None
     orientation: 'horizontal'
-    size_hint_y: None
     height: self.minimum_height
     edit_association: None
     association_id: 0
 
     MDLabel:
         text: root.date
+        size_hint_x: 1
     MDLabel:
         text: root.work_time
+        size_hint_x: 0.75
     MDLabel:
         text: root.lunch_break
-    MDLabel:    
+        size_hint_x: 0.75
+    MDLabel:
         text: root.work_break
+        size_hint_x: 0.75
+
+    MDBoxLayout:  # Wrapping button in a layout with a set width
+        size_hint_x: 0.35
+        MDIconButton:
+            id: option_button
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            size_hint_x: 1
+            size_hint_y: 0.8
+            on_release: root.hourslogscreen.open_menu(root)
+            icon: "plus"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.primary_color
+            style: "tonal"
 
 <HoursLogScreen>:
     MDBoxLayout:
@@ -46,6 +64,16 @@
                 id: export
                 text: "Export data"
                 on_release: root.export()
+            
+            MDRaisedButton:
+                id: add_checkin
+                text: "Add Checkin"
+                on_release: root.add_check_inout("checkin")
+            
+            MDRaisedButton:
+                id: add_checkout
+                text: "Add Checkout"
+                on_release: root.add_check_inout("checkout")
 
         # Horizontal Divider Line
         BoxLayout:
@@ -60,7 +88,7 @@
         MDBoxLayout:
             orientation: 'vertical'
             MDBoxLayout:
-                size_hint_y: 0.06
+                size_hint_y: 0.1
                 orientation: 'horizontal'
                 MDLabel:
                     valign: "center"
@@ -68,26 +96,35 @@
                     text: "Date"
                     bold: True
                 MDLabel:
+                    size_hint_x: 0.75
                     valign: "center"
                     halign: "left"
-                    text: "Work Time"
+                    text: "Work"
                     bold: True
                 MDLabel:
+                    size_hint_x: 0.75
                     valign: "center"
                     halign: "left"
-                    text: "Lunch Break"
+                    text: "Lunch"
                     bold: True
                 MDLabel:
+                    size_hint_x: 0.75
                     valign: "center"
                     halign: "left"
                     text: "Pause"
+                    bold: True
+                MDLabel:
+                    size_hint_x: 0.35
+                    valign: "center"
+                    halign: "left"
+                    text: "Opt"
                     bold: True
 
             RecycleView:
                 id: hours_summary
                 viewclass: 'HoursSummaryList'  # Use custom item layout
                 RecycleBoxLayout:
-                    default_size: None, dp(25)
+                    default_size: None, dp(30)
                     size_hint_y: None
                     default_size_hint: 1, None
                     height: self.minimum_height

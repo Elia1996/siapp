@@ -4,7 +4,7 @@ from siapp.db.database import (
     current_state,
     set_work_log,
     analyze_hours,
-    get_data_summary,
+    get_hourslog_data_summary,
     save_exported_data,
     get_fmanager_path,
     get_worked_hours_today,
@@ -62,7 +62,7 @@ class HoursLogScreen(MDScreen):
             },
         ]
         self.menu = MDDropdownMenu(
-            caller=root.ids.option_button, items=menu_items, width_mult=4
+            caller=root.ids.option_button, items=menu_items, width_mult=3
         )
         self.menu.open()
 
@@ -117,7 +117,7 @@ class HoursLogScreen(MDScreen):
         self.update_summary_list()
 
     def update_summary_list(self):
-        l_data = get_data_summary()
+        l_data = get_hourslog_data_summary()
         l_final_data = []
         for data in l_data:
             l_final_data.append(data)

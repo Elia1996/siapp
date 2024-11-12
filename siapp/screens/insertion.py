@@ -12,7 +12,7 @@ from siapp.db.database import (
     get_fmanager_path,
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
-from siapp.db.models import create_database
+from kivymd.uix.menu import MDDropdownMenu
 
 Builder.load_file("siapp/screens/insertion.kv")
 
@@ -75,11 +75,11 @@ class InsertionScreen(MDScreen):
             if mean_response_time is None:
                 mean_response_time = "Nan"
             else:
-                mean_response_time = str(
-                    timedelta(seconds=int(mean_response_time))
-                )
+                mean_response_time = str(timedelta(seconds=mean_response_time))
                 # remove hours and minutes
-                mean_response_time = mean_response_time.split(":")[1:]
+                mean_response_time = ":".join(
+                    mean_response_time.split(":")[1:]
+                )
             l_data.append(
                 {
                     "information_text": assoc.information,
@@ -90,6 +90,7 @@ class InsertionScreen(MDScreen):
                     "height": max_height,
                     "edit_association": self.edit_association,
                     "association_id": assoc.id,
+                    "insertionscreen": self,
                 }
             )
         if l_data == []:
@@ -103,12 +104,10 @@ class InsertionScreen(MDScreen):
                     "height": 0,
                     "edit_association": None,
                     "association_id": 0,
+                    "insertionscreen": self,
                 }
             ]
         self.ids.associations_list.data = l_data
-
-    def edit_association(self, association):
-        pass
 
     def calculate_text_height(self, text, font_size=14):
         # Use CoreLabel to calculate the height of the text
@@ -148,3 +147,100 @@ class InsertionScreen(MDScreen):
             elif self._image_type == "pao":
                 self.ids.pao_image.source = path  # Set image source for pao
             self.close_filechooser()  # Close the file chooser
+
+    def open_edit_menu(self, root):
+        """Open the menu to modify the association"""
+        menu_items = [
+            {
+                "text": "Edit",
+                "on_release": lambda x="edit": self.edit_menu_callback(
+                    x, root
+                ),
+            },
+            {
+                "text": "Delete",
+                "on_release": lambda x="delete": self.edit_menu_callback(
+                    x, root
+                ),
+            },
+        ]
+        self.menu = MDDropdownMenu(
+            caller=root.ids.option_button, items=menu_items, width_mult=3
+        )
+        self.menu.open()
+
+    def edit_menu_callback(self, action, root):
+        """Trigger the correct action"""
+        if action == "edit":
+            self.edit_association(root)
+        elif action == "delete":
+            self.delete_association(root)
+
+    def edit_association(self, root):
+        """Edit the association"""
+        from siapp.db.database import get_association_by_id
+
+        assoc = get_association_by_id(root.association_id)
+        if assoc is None:
+            return
+        self.ids.information.text = assoc.information
+        self.ids.character.text = assoc.character_text
+        self.ids.action.text = assoc.action_text
+        self.ids.object.text = assoc.object_text
+        self.ids.information_image.source = assoc.information_image
+        self.ids.pao_image.source = assoc.pao_image
+        self.ids.save_association_button.opacity = 0
+        self.ids.association_id_label.text = str(assoc.id)
+        self.ids.association_id_label.opacity = 1
+        self.ids.update_association_button.opacity = 1
+        self.ids.cancel_update_button.opacity = 1
+
+    def update_association(self):
+        """Update the association"""
+        from siapp.db.database import update_association, get_association_by_id
+        from siapp.db.models import Association
+
+        assoc = get_association_by_id(int(self.ids.association_id_label.text))
+        if assoc is None:
+            return
+        assoc.information = self.ids.information.text
+        assoc.character_text = self.ids.character.text
+        assoc.action_text = self.ids.action.text
+        assoc.object_text = self.ids.object.text
+        assoc.information_image = self.ids.information_image.source
+        assoc.pao_image = self.ids.pao_image.source
+        update_association(assoc)
+        self.ids.information.text = ""
+        self.ids.character.text = ""
+        self.ids.action.text = ""
+        self.ids.object.text = ""
+        self.ids.information_image.source = ""
+        self.ids.pao_image.source = ""
+
+        self.ids.save_association_button.opacity = 1
+        self.ids.association_id_label.text = ""
+        self.ids.association_id_label.opacity = 0
+        self.ids.update_association_button.opacity = 0
+        self.ids.cancel_update_button.opacity = 0
+        self.refresh_association_list()
+
+    def cancel_update(self):
+        """Cancel the update of the association"""
+        self.ids.information.text = ""
+        self.ids.character.text = ""
+        self.ids.action.text = ""
+        self.ids.object.text = ""
+        self.ids.information_image.source = ""
+        self.ids.pao_image.source = ""
+        self.ids.save_association_button.opacity = 1
+        self.ids.association_id_label.text = ""
+        self.ids.association_id_label.opacity = 0
+        self.ids.update_association_button.opacity = 0
+        self.ids.cancel_update_button.opacity = 0
+
+    def delete_association(self, root):
+        """Delete the association"""
+        from siapp.db.database import delete_association
+
+        delete_association(root.association_id)
+        self.refresh_association_list()

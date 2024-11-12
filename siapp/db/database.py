@@ -121,7 +121,86 @@ def get_mean_response_time(assoc: Association) -> Optional[float]:
         return None
 
 
+def fetchall_to_associations(fetchall: List[tuple]) -> List[Association]:
+    return [list_to_association(assoc) for assoc in fetchall]
+
+
+def get_all_associations() -> List[Association]:
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Association")
+        l_ass = cursor.fetchall()
+        l_ass = fetchall_to_associations(l_ass)
+    return l_ass
+
+
+def update_association(ass: Association):
+    association_id = ass.id
+    d_modified = ass.get_modified_dict()
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        columns = ", ".join([f"{k} = ?" for k in d_modified])
+        values = list(d_modified.values()) + [association_id]
+        cursor.execute(
+            f"UPDATE Association SET {columns} WHERE id = ?", values
+        )
+        conn.commit()
+
+
+def delete_association(assoc_id: int):
+    """Delete the corresponding associaction data"""
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Association WHERE id=?", (assoc_id,))
+        conn.commit()
+
+
+def list_to_association(l: List) -> Association:
+    return Association(
+        id=l[0],
+        information=l[1],
+        information_image=l[2],
+        character_text=l[3],
+        pao_image=l[4],
+        action_text=l[5],
+        object_text=l[6],
+        last_response_time_I_to_PAO=l[7],
+        last_response_time_P_to_I=l[8],
+        last_response_time_A_to_I=l[9],
+        last_response_time_O_to_I=l[10],
+        creation_date=l[11],
+        last_repetition_date=l[12],
+        refresh_count=l[13],
+        difficulty=l[14],
+        retention_index=l[15],
+    )
+
+
+def get_association_by_id(association_id: int) -> Association:
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM Association WHERE id=?", (association_id,)
+        )
+        association = cursor.fetchone()
+        return list_to_association(association)
+
+
+##############################################################################
+##############################################################################
+# Hourslog database functions
+
+
 def calculate_retention_index():
+    """Calculate the retention index for each association in the database."""
     now = datetime.now()
     from siapp.db.models import DATABASE
 
@@ -220,57 +299,6 @@ def retention_index(
     # Example placeholder for retention calculation logic
     days = time_delta.days
     return max(0, (refresh_count / (1 + difficulty * days)))
-
-
-def list_to_association(l: List) -> Association:
-    return Association(
-        id=l[0],
-        information=l[1],
-        information_image=l[2],
-        character_text=l[3],
-        pao_image=l[4],
-        action_text=l[5],
-        object_text=l[6],
-        last_response_time_I_to_PAO=l[7],
-        last_response_time_P_to_I=l[8],
-        last_response_time_A_to_I=l[9],
-        last_response_time_O_to_I=l[10],
-        creation_date=l[11],
-        last_repetition_date=l[12],
-        refresh_count=l[13],
-        difficulty=l[14],
-        retention_index=l[15],
-    )
-
-
-def fetchall_to_associations(fetchall: List[tuple]) -> List[Association]:
-    return [list_to_association(assoc) for assoc in fetchall]
-
-
-def get_all_associations() -> List[Association]:
-    from siapp.db.models import DATABASE
-
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Association")
-        l_ass = cursor.fetchall()
-        l_ass = fetchall_to_associations(l_ass)
-    return l_ass
-
-
-def update_association(ass: Association):
-    association_id = ass.id
-    d_modified = ass.get_modified_dict()
-    from siapp.db.models import DATABASE
-
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        columns = ", ".join([f"{k} = ?" for k in d_modified])
-        values = list(d_modified.values()) + [association_id]
-        cursor.execute(
-            f"UPDATE Association SET {columns} WHERE id = ?", values
-        )
-        conn.commit()
 
 
 # Funzioni per i log di lavoro
@@ -398,7 +426,7 @@ def analyze_hours():
         conn.commit()
 
 
-def get_data_summary():
+def get_hourslog_data_summary():
     """Fetch workday data and structure it as a list of dictionaries
     for display.
 
@@ -447,7 +475,7 @@ def delete_workday_entry(workday_id: int):
         conn.commit()
 
 
-def get_export_data() -> list:
+def get_hourslog_export_data() -> list:
     """Fetch workday and work log data, structure it as a list of dictionaries for CSV export."""
     from siapp.db.models import DATABASE
 
@@ -494,7 +522,7 @@ def get_export_data() -> list:
 
 def save_exported_data(output_folder: Path):
     """Export the work data to a CSV file in the specified output folder."""
-    data = get_export_data()
+    data = get_hourslog_export_data()
     filename = Path("HoursLog.csv")
     output_file = Path(output_folder) / filename.name
 

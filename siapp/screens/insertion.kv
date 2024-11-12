@@ -5,7 +5,6 @@
     object_text: ""
     response_time: ""
     orientation: 'horizontal'
-    size_hint_y: None
     height: self.minimum_height
     edit_association: None
     association_id: 0
@@ -26,14 +25,22 @@
         text: root.object_text
         font_size: 15
     MDLabel:
+        size_hint_x: 1.5
         text: root.response_time
         font_size: 15
-    MDRaisedButton:
-        size_hint_x: 0.1
-        size_hint_y: 0.5
-        pos_hint: {"center_x": 0.5, "center_y": 0.5}
-        text_color: app.theme_cls.primary_color
-        on_release: root.edit_association(root.association_id)
+
+    MDBoxLayout:  # Wrapping button in a layout with a set width
+        size_hint_x: 0.35
+        MDIconButton:
+            id: option_button
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            size_hint_x: 1
+            size_hint_y: 0.8
+            on_release: root.insertionscreen.open_edit_menu(root)
+            icon: "pencil-outline"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.primary_color
+            style: "tonal"
 
     
 
@@ -121,9 +128,31 @@
                 orientation: 'horizontal'
                 size_hint_y: 0.25
                 MDRaisedButton:
+                    id: save_association_button
                     text: "Salva Associazione"
                     md_bg_color: app.theme_cls.primary_color
                     on_release: root.save_association(information.text, character.text, action.text, object.text, information_image.source, pao_image.source)
+
+                MDRaisedButton:
+                    id: update_association_button
+                    text: "Update Associazione"
+                    md_bg_color: app.theme_cls.primary_color
+                    on_release: root.update_association()
+                    opacity: 0
+                
+                MDRaisedButton:
+                    id: cancel_update_button
+                    text: "Cancel Association Edit"
+                    md_bg_color: app.theme_cls.primary_color
+                    on_release: root.cancel_update()
+                    opacity: 0
+                
+                MDLabel:
+                    id: association_id_label
+                    text: ""
+                    font_size: 15
+                    bold: True
+                    opacity: 0
 
         MDBoxLayout:
             orientation: 'vertical'
@@ -135,7 +164,7 @@
             #        pos: self.pos
             #        size: self.size
             MDBoxLayout:
-                size_hint_y: 0.3
+                size_hint_y: 0.2
                 orientation: 'horizontal'
                 MDLabel:
                     text: "Informazione"
@@ -157,12 +186,13 @@
                     text: "Oggetto"
                     bold: True
                 MDLabel:
+                    size_hint_x: 1.5
                     text: "Tempo di Risposta"
                     font_size: 15
                     bold: True
                 MDLabel:
                     text: "Edit"
-                    size_hint_x: 0.6
+                    size_hint_x: 0.35
                     font_size: 15
                     bold: True
 
@@ -170,7 +200,7 @@
                 id: associations_list
                 viewclass: 'ListItem'  # Use custom item layout
                 RecycleBoxLayout:
-                    default_size: None, dp(25)
+                    default_size: None, dp(40)
                     size_hint_y: None
                     default_size_hint: 1, None
                     height: self.minimum_height

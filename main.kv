@@ -46,20 +46,19 @@ BoxLayout:
 
                 MDNavigationDrawerLabel:
                     text: "Navigation"
-                
-                DrawerClickableItem:
-                    icon: "clock-outline"
-                    text: "Hours Log"
-                    on_release:
-                        screen_manager.current = "hourslog"
-                        nav_drawer.set_state("close")
-
 
                 DrawerClickableItem:
                     icon: "home"
                     text: "Main Page"
                     on_release:
                         screen_manager.current = "main_page"
+                        nav_drawer.set_state("close")
+
+                DrawerClickableItem:
+                    icon: "clock-outline"
+                    text: "Hours Log"
+                    on_release:
+                        screen_manager.current = "hourslog"
                         nav_drawer.set_state("close")
 
                 DrawerClickableItem:

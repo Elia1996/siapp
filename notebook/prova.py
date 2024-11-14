@@ -1,36 +1,72 @@
-from kivy.lang import Builder
-from kivymd.uix.menu import MDDropdownMenu
-
-from kivymd.app import MDApp
-
-KV = """
-MDScreen
-    md_bg_color: self.theme_cls.backgroundColor
-
-    MDDropdownMenu:
-        id: drop_text
-        text: "Select item"
-        on_release:  print(*args)
-
+"""
+Example of an Android filechooser.
 """
 
+from textwrap import dedent
 
-class Example(MDApp):
-    def open_menu(self, item):
-        menu_items = [
-            {
-                "text": f"{i}",
-                "on_release": lambda x=f"Item {i}": self.menu_callback(x),
-            }
-            for i in range(5)
-        ]
-        MDDropdownMenu(caller=item, items=menu_items).open()
+from plyer import filechooser
 
-    def menu_callback(self, text_item):
-        self.root.ids.drop_text.text = text_item
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.properties import ListProperty
+from kivy.uix.button import Button
+
+
+class FileChoose(Button):
+    """
+    Button that triggers 'filechooser.open_file()' and processes
+    the data response from filechooser Activity.
+    """
+
+    selection = ListProperty([])
+
+    def choose(self):
+        """
+        Call plyer filechooser API to run a filechooser Activity.
+        """
+        filechooser.open_file(on_selection=self.handle_selection)
+
+    def handle_selection(self, selection):
+        """
+        Callback function for handling the selection response from Activity.
+        """
+        self.selection = selection
+
+    def on_selection(self, *a, **k):
+        """
+        Update TextInput.text after FileChoose.selection is changed
+        via FileChoose.handle_selection.
+        """
+        App.get_running_app().root.ids.result.text = str(self.selection)
+
+
+class ChooserApp(App):
+    """
+    Application class with root built in KV.
+    """
 
     def build(self):
-        return Builder.load_string(KV)
+        return Builder.load_string(
+            dedent("""
+            <FileChoose>:
+
+            BoxLayout:
+
+                BoxLayout:
+                    orientation: 'vertical'
+
+                    TextInput:
+                        id: result
+                        text: ''
+                        hint_text: 'selected path'
+
+                    FileChoose:
+                        size_hint_y: 0.1
+                        on_release: self.choose()
+                        text: 'Select a file'
+        """)
+        )
 
 
-Example().run()
+if __name__ == "__main__":
+    ChooserApp().run()

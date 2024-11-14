@@ -60,16 +60,36 @@ def get_fmanager_path() -> str:
 
 def add_association(
     information: str,
-    information_image: Optional[bytes] = None,
+    information_image: Optional[str] = None,
     character_text: Optional[str] = None,
-    pao_image: Optional[bytes] = None,
+    pao_image: Optional[str] = None,
     action_text: Optional[str] = None,
     object_text: Optional[str] = None,
 ):
     from siapp.db.models import DATABASE
+    from shutil import copyfile
+    from pathlib import Path
 
+    # Copy the image near the database
+    if information_image and os.path.exists(information_image):
+        info = Path(information_image)
+        new_info = Path(DATABASE).parent.absolute() / info.name
+        print(
+            "Copying", information_image, "to", new_info, "database:", DATABASE
+        )
+        copyfile(information_image, new_info)
+        information_image = str(new_info)
+    if pao_image and os.path.exists(pao_image):
+        pao = Path(pao_image)
+        new_pao = Path(DATABASE).parent.absolute() / pao.name
+        copyfile(pao_image, new_pao)
+        pao_image = str(new_pao)
+
+    print("Adding association to: ", DATABASE)
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
+        # Print all associations
+
         cursor.execute(
             """
             INSERT INTO Association (
@@ -287,6 +307,7 @@ def current_state() -> bool:
         )
         log = cursor.fetchone()
 
+        # print("Log:", log)
         if log is None:
             return False  # No log found
 

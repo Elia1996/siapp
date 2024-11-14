@@ -10,6 +10,7 @@ from siapp.db.database import (
     get_worked_hours_today,
     delete_workday_entry,
 )
+from siapp.db.models import create_database
 from kivymd.uix.filemanager import (
     MDFileManager,
 )  # Usa MDFileManager al posto di FileChooserIconView
@@ -38,7 +39,9 @@ class MyLabelBox(MDBoxLayout):
 
 
 class HoursLogScreen(MDScreen):
-    loggedin = (0.745, 0, 0, 1)
+    loggedin_color = (0.745, 0, 0, 1)
+    login_state_text = StringProperty("Click to Log Out\n(you are Logged In)")
+    logout_state_text = StringProperty("Click to Log In\n(you are Logged Out)")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -49,6 +52,7 @@ class HoursLogScreen(MDScreen):
         )
         self._excel_output_path = None
         self.menu = None
+        create_database()
 
     def open_menu(self, root):
         menu_items = [
@@ -62,7 +66,7 @@ class HoursLogScreen(MDScreen):
             },
         ]
         self.menu = MDDropdownMenu(
-            caller=root.ids.option_button, items=menu_items, width_mult=3
+            caller=root.ids.option_button, items=menu_items
         )
         self.menu.open()
 
@@ -88,16 +92,22 @@ class HoursLogScreen(MDScreen):
         # Close the file manager
         self.file_manager.close()
 
-    def on_enter(self):
+    def update_loginout_status(self):
         state = current_state()
         if state:
-            self.ids.hourslog.text = "You are Logged In"
-            self.ids.hourslog.md_bg_color = self.loggedin
+            self.ids.hourslog.text = self.login_state_text
+            self.ids.hourslog.md_bg_color = self.loggedin_color
         else:
-            self.ids.hourslog.text = "You are Logged Out"
+            self.ids.hourslog.text = self.logout_state_text
             self.ids.hourslog.md_bg_color = self.theme_cls.primary_color
+
+    def on_enter(self):
+        self.update_loginout_status()
         self.update_summary_list()
         Clock.schedule_interval(self.update_worked_hours_today, 1)
+
+    def on_leave(self):
+        Clock.unschedule(self.update_worked_hours_today)
 
     def update_worked_hours_today(self, dt):
         worked_hours = str(get_worked_hours_today())
@@ -105,13 +115,13 @@ class HoursLogScreen(MDScreen):
 
     def add_log(self, button):
         # Check the current state and toggle text and color
-        if button.text == "You are Logged In":
-            button.text = "You are Logged Out"
+        if button.text == self.login_state_text:
+            button.text = self.logout_state_text
             button.md_bg_color = self.theme_cls.primary_color
             set_work_log(False, datetime.now())
         else:
-            button.text = "You are Logged In"
-            button.md_bg_color = self.loggedin
+            button.text = self.login_state_text
+            button.md_bg_color = self.loggedin_color
             set_work_log(True, datetime.now())
         analyze_hours()
         self.update_summary_list()
@@ -124,6 +134,7 @@ class HoursLogScreen(MDScreen):
             l_final_data[-1]["hourslogscreen"] = self
 
         self.ids.hours_summary.data = l_final_data
+        self.update_loginout_status()
 
     def export(self):
         """Export data from db to an excel and ask user where to save it"""

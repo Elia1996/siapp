@@ -4,12 +4,15 @@
     action_text: ""
     object_text: ""
     response_time: ""
-    orientation: 'horizontal'
     height: self.minimum_height
     edit_association: None
     association_id: 0
+    insertionscreen: None
+    orientation: 'horizontal'
+    spacing: 5
 
     MDLabel:
+        size_hint_x: 1
         text: root.information_text
         font_size: 15
     MDLabel:
@@ -17,7 +20,7 @@
         text: root.character_text
         font_size: 15
     MDLabel:
-        size_hint_x: 1.5
+        size_hint_x: 2
         text: root.action_text
         font_size: 15
     MDLabel:    
@@ -25,14 +28,14 @@
         text: root.object_text
         font_size: 15
     MDLabel:
-        size_hint_x: 1.5
+        size_hint_x: 1.3
         text: root.response_time
         font_size: 15
 
     MDBoxLayout:  # Wrapping button in a layout with a set width
-        size_hint_x: 0.35
+        size_hint_x: 0.6
         MDIconButton:
-            id: option_button
+            id: option_button_insertion
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             size_hint_x: 1
             size_hint_y: 0.8
@@ -80,13 +83,11 @@
                 MDCard:
                     Image:
                         id: information_image  # This will be accessed in Python code to update the image source
-                        allow_stretch: False
-                        keep_ratio: True
 
                 MDRaisedButton:
                     text: "Choose an Image"
                     size_hint_x: 0.4
-                    on_release: root.open_filechooser_info()  # Calls the method to open the file chooser
+                    on_release: root.open_filechooser("info")  # Calls the method to open the file chooser
 
             MDBoxLayout:
                 orientation: 'horizontal'
@@ -113,14 +114,12 @@
                 MDCard:
                     Image:
                         id: pao_image  # This will be accessed in Python code to update the image source
-                        allow_stretch: False
-                        keep_ratio: True
 
                 MDRaisedButton:
                     text: "Choose an Image"
                     size_hint_x: 0.4
                     md_bg_color: app.theme_cls.primary_color
-                    on_release: root.open_filechooser_pao()  # Calls the method to open the file chooser
+                    on_release: root.open_filechooser("pao")  # Calls the method to open the file chooser
 
             MDBoxLayout:
                 padding: 5
@@ -131,7 +130,7 @@
                     id: save_association_button
                     text: "Salva Associazione"
                     md_bg_color: app.theme_cls.primary_color
-                    on_release: root.save_association(information.text, character.text, action.text, object.text, information_image.source, pao_image.source)
+                    on_release: root.save_association()
 
                 MDRaisedButton:
                     id: update_association_button
@@ -150,12 +149,12 @@
                 MDLabel:
                     id: association_id_label
                     text: ""
-                    font_size: 15
                     bold: True
                     opacity: 0
 
         MDBoxLayout:
             orientation: 'vertical'
+            padding: 10
             #canvas.before:
             #    Color:
             #        rgba: 0, 1, 0, 1
@@ -167,33 +166,28 @@
                 size_hint_y: 0.2
                 orientation: 'horizontal'
                 MDLabel:
-                    text: "Informazione"
-                    font_size: 15
+                    size_hint_x: 1
+                    text: "Info"
                     bold: True
                 MDLabel:
                     size_hint_x: 1.5
                     text: "Personaggio"
-                    font_size: 15
                     bold: True
                 MDLabel:
-                    size_hint_x: 1.5
-                    font_size: 15
+                    size_hint_x: 2
                     text: "Azione"
                     bold: True
                 MDLabel:
                     size_hint_x: 1.5
-                    font_size: 15
                     text: "Oggetto"
                     bold: True
                 MDLabel:
-                    size_hint_x: 1.5
-                    text: "Tempo di Risposta"
-                    font_size: 15
+                    size_hint_x: 1.3
+                    text: "Tempo di\nRisposta"
                     bold: True
                 MDLabel:
                     text: "Edit"
-                    size_hint_x: 0.35
-                    font_size: 15
+                    size_hint_x: 0.6
                     bold: True
 
             RecycleView:

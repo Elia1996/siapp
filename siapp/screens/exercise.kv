@@ -41,12 +41,14 @@
         # https://rgbcolorpicker.com/0-1
         MyLabelBox:
             id: information_label
+            size_hint_y: 0.25
             box_color: 0.0, 0.75, 0.71, 1 # Slate Grey background
             title_text: "Information"
             main_text: ""
             main_text_opacity: "0"
         
         MDBoxLayout:
+            size_hint_y: 1
             id: container_information
             orientation: 'vertical'
             MDCard:
@@ -57,17 +59,17 @@
                     id: information_image
                     source: ""
                     size_hint_y: 2
-                    allow_stretch: True
-                    keep_ratio: True
         
         MyLabelBox:
             id: character_label
+            size_hint_y: 0.25
             box_color: 0.94, 0.52, 0.38, 1  # Turquoise background
             title_text: "Character"
             main_text: ""
             main_text_opacity: "0"
 
         MyLabelBox:
+            size_hint_y: 0.25
             id: action_label
             box_color: 0.98, 0.82, 0.44, 1  # Turquoise background
             title_text: "Action"
@@ -75,6 +77,7 @@
             main_text_opacity: "0"
 
         MyLabelBox:
+            size_hint_y: 0.25
             id: object_label
             box_color: 0.76, 0.69, 0.91, 1  # Turquoise background
             title_text: "Object"
@@ -82,6 +85,7 @@
             main_text_opacity: "0"
        
         MDBoxLayout:
+            size_hint_y: 1
             id: container_pao
             orientation: 'vertical'
             MDCard:
@@ -93,10 +97,9 @@
                     source: ""
                     size_hint_y: 2
                     allow_stretch: True
-                    keep_ratio: True
 
         MDBoxLayout:
-            size_hint_y: 0.5
+            size_hint_y: 0.3
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             MDRaisedButton:
                 id: show_solution_button
@@ -104,7 +107,7 @@
                 on_release: root.show_solution()  # Show the PAO details
 
         MDBoxLayout:
-            size_hint_y: 0.5
+            size_hint_y: 0.3
             orientation: 'horizontal'
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             spacing: 10

@@ -4,6 +4,8 @@ from kivymd.uix.filemanager import (
     MDFileManager,
 )  # Usa MDFileManager al posto di FileChooserIconView
 from kivy.metrics import dp
+from plyer import filechooser
+from kivy.properties import ListProperty
 from kivy.lang import Builder
 from kivy.core.text import Label as CoreLabel
 from siapp.db.database import (
@@ -12,42 +14,31 @@ from siapp.db.database import (
     get_fmanager_path,
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
+from siapp.db.models import create_database
 from kivymd.uix.menu import MDDropdownMenu
+from siapp.utils.images import path_to_bytes
 
 Builder.load_file("siapp/screens/insertion.kv")
 
 
 class InsertionScreen(MDScreen):
+    info_image_path = ListProperty([])
+    pao_image_path = ListProperty([])
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._image_type = None
-        self.file_manager = MDFileManager(
-            exit_manager=self.close_filechooser,
-            select_path=self.load_image,
-            selector="file",
-            sort_by="date",
-        )
-        self.file_manager.ext = [".png", ".jpg", ".jpeg"]
 
-    def on_enter(self):
-        self.refresh_association_list()
+    def on_pre_enter(self):
+        create_database()
 
-    def save_association(
-        self,
-        information,
-        character,
-        action,
-        object,
-        information_image,
-        pao_image,
-    ):
+    def save_association(self):
         add_association(
-            information=information,
-            character_text=character,
-            action_text=action,
-            object_text=object,
-            information_image=information_image,
-            pao_image=pao_image,
+            information=self.ids.information.text,
+            information_image=self.ids.information_image.source,
+            character_text=self.ids.character.text,
+            pao_image=self.ids.pao_image.source,
+            action_text=self.ids.action.text,
+            object_text=self.ids.object.text,
         )
         # Optionally, clear fields after saving
         self.ids.information.text = ""
@@ -60,16 +51,15 @@ class InsertionScreen(MDScreen):
 
     def refresh_association_list(self):
         # Refresh the association list in the ExerciseScreen
+        print("Getting all associations")
         associations = get_all_associations()
 
         l_data = []
+        print(
+            f"Calculating response times for {len(associations)} associations"
+        )
         for assoc in associations:
-            max_height = max(
-                self.calculate_text_height(assoc.information),
-                self.calculate_text_height(assoc.character_text),
-                self.calculate_text_height(assoc.action_text),
-                self.calculate_text_height(assoc.object_text),
-            )
+            print(f"Calculating response time for association {assoc.id}")
             mean_response_time = get_mean_response_time(assoc)
             # Convert to timedelta
             if mean_response_time is None:
@@ -80,6 +70,11 @@ class InsertionScreen(MDScreen):
                 mean_response_time = ":".join(
                     mean_response_time.split(":")[1:]
                 )
+                mean_response_time = (
+                    mean_response_time.split(".")[0]
+                    + "."
+                    + mean_response_time.split(".")[1][:3]
+                )
             l_data.append(
                 {
                     "information_text": assoc.information,
@@ -87,7 +82,6 @@ class InsertionScreen(MDScreen):
                     "action_text": assoc.action_text,
                     "object_text": assoc.object_text,
                     "response_time": f"{mean_response_time}",
-                    "height": max_height,
                     "edit_association": self.edit_association,
                     "association_id": assoc.id,
                     "insertionscreen": self,
@@ -101,7 +95,6 @@ class InsertionScreen(MDScreen):
                     "action_text": "",
                     "object_text": "",
                     "response_time": "",
-                    "height": 0,
                     "edit_association": None,
                     "association_id": 0,
                     "insertionscreen": self,
@@ -115,38 +108,27 @@ class InsertionScreen(MDScreen):
         label.refresh()  # Refresh to calculate the texture size
         return dp(20)
 
-    def open_filechooser_info(self):
-        self.open_filechooser("info")
+    def open_filechooser(self, image_type):
+        if image_type == "info":
+            filechooser.open_file(
+                on_selection=self.handle_info_image_selection
+            )
+        elif image_type == "pao":
+            filechooser.open_file(on_selection=self.handle_pao_image_selection)
 
-    def open_filechooser_pao(self):
-        self.open_filechooser("pao")
+    def handle_info_image_selection(self, selection):
+        self.info_image_path = selection
 
-    def open_filechooser(self, image_type: str):
-        """Open a file chooser to select an image file.
+    def handle_pao_image_selection(self, selection):
+        self.pao_image_path = selection
 
-        Args:
-            image_type: the type of image to select (information
-                or pao)
-        """
-        self._image_type = image_type
-        self.file_manager.show(
-            get_fmanager_path()
-        )  # Opens file manager at root or specific path
+    def on_info_image_path(self, instance, value):
+        if value:
+            self.ids.information_image.source = value[0]
 
-    def close_filechooser(self, *args):
-        """Close the file chooser."""
-        self.file_manager.close()
-
-    def load_image(self, path):
-        """Load the selected image from the file chooser."""
-        if path:
-            if self._image_type == "info":
-                self.ids.information_image.source = (
-                    path  # Set image source for information
-                )
-            elif self._image_type == "pao":
-                self.ids.pao_image.source = path  # Set image source for pao
-            self.close_filechooser()  # Close the file chooser
+    def on_pao_image_path(self, instance, value):
+        if value:
+            self.ids.pao_image.source = value[0]
 
     def open_edit_menu(self, root):
         """Open the menu to modify the association"""
@@ -165,7 +147,7 @@ class InsertionScreen(MDScreen):
             },
         ]
         self.menu = MDDropdownMenu(
-            caller=root.ids.option_button, items=menu_items, width_mult=3
+            caller=root.ids.option_button_insertion, items=menu_items
         )
         self.menu.open()
 
@@ -198,7 +180,6 @@ class InsertionScreen(MDScreen):
     def update_association(self):
         """Update the association"""
         from siapp.db.database import update_association, get_association_by_id
-        from siapp.db.models import Association
 
         assoc = get_association_by_id(int(self.ids.association_id_label.text))
         if assoc is None:

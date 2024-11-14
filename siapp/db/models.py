@@ -13,8 +13,10 @@ class Association:
         id: Optional[int] = None,  # 0
         information: str = "",  # 1
         information_image: Optional[bytes] = None,  # 2
+        information_image_ext: Optional[str] = None,  # 17
         character_text: Optional[str] = None,  # 3
         pao_image: Optional[bytes] = None,  # 4
+        pao_image_ext: Optional[str] = None,  # 16
         action_text: Optional[str] = None,  # 5
         object_text: Optional[str] = None,  # 6
         last_response_time_I_to_PAO: Optional[float] = None,  # 7
@@ -69,6 +71,15 @@ class Association:
         self._changed.append("information_image")
 
     @property
+    def information_image_ext(self) -> Optional[str]:
+        return self._data["information_image_ext"]
+
+    @information_image_ext.setter
+    def information_image_ext(self, value: Optional[str]):
+        self._data["information_image_ext"] = value
+        self._changed.append("information_image_ext")
+
+    @property
     def character_text(self) -> Optional[str]:
         return self._data["character_text"]
 
@@ -85,6 +96,15 @@ class Association:
     def pao_image(self, value: Optional[bytes]):
         self._data["pao_image"] = value
         self._changed.append("pao_image")
+
+    @property
+    def pao_image_ext(self) -> Optional[str]:
+        return self._data["pao_image_ext"]
+
+    @pao_image_ext.setter
+    def pao_image_ext(self, value: Optional[str]):
+        self._data["pao_image_ext"] = value
+        self._changed.append("pao_image_ext")
 
     @property
     def action_text(self) -> Optional[str]:
@@ -230,6 +250,22 @@ def create_tables():
     conn.close()
 
 
+def add_missing_ext():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+        ALTER TABLE Association ADD COLUMN pao_image_ext TEXT
+        """
+        )
+        cursor.execute(
+            """
+        ALTER TABLE Association ADD COLUMN information_image_ext TEXT
+        """
+        )
+    conn.close()
+
+
 # Check if the database is created, if yes don't create it again
 def create_database():
     global DATABASE
@@ -237,7 +273,16 @@ def create_database():
     if platform == "android":
         DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
     else:
-        DATABASE = "memory_app.db"
+        DATABASE = ".data/memory_app.db"
+        from pathlib import Path
+
+        DATABASE = str(Path(DATABASE).resolve().absolute())
+        from pathlib import Path
+
+        if not Path(DATABASE).exists():
+            import os
+
+            os.makedirs(".data", exist_ok=True)
 
     try:
         with sqlite3.connect(DATABASE) as conn:

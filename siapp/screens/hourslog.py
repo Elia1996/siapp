@@ -256,8 +256,19 @@ class HoursLogScreen(MDScreen):
 
     def update_chips(self, worday_id: int):
         """Aggiorna tutte le chip esistenti"""
-        self.remove_all_chips()
-        for i, log in enumerate(get_worklog_data_summary(worday_id)):
-            self.add_check_chip(log["check_in"], log["timestamp"], log["uid"])
+        l_chips_id = []
+        for chip in self.ids.chips_container.children:
+            l_chips_id.append(int(chip.id.split("_")[1]))
+        l_current_chips_id = get_worklog_data_summary(worday_id)
+        for i, log in enumerate(l_current_chips_id):
+            if log["uid"] not in l_chips_id:
+                self.add_check_chip(
+                    log["check_in"], log["timestamp"], log["uid"]
+                )
             if i > 20:
                 break
+        for chip in self.ids.chips_container.children:
+            if int(chip.id.split("_")[1]) not in [
+                x["uid"] for x in l_current_chips_id
+            ]:
+                self.ids.chips_container.remove_widget(chip)

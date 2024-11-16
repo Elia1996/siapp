@@ -323,7 +323,7 @@ def retention_index(
 
 
 # Funzioni per i log di lavoro
-def set_work_log(check_in: bool, time: datetime):
+def set_work_log(check_in: bool, time: datetime) -> int:
     today = time.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     from siapp.db.models import DATABASE
 
@@ -345,7 +345,10 @@ def set_work_log(check_in: bool, time: datetime):
         """,
             (time.isoformat(), int(check_in), work_day_id),
         )
+        uid = cursor.lastrowid
         conn.commit()
+
+    return uid
 
 
 def get_worked_hours_today() -> timedelta:
@@ -478,6 +481,46 @@ def get_hourslog_data_summary():
         ]
 
 
+def get_last_workday_id() -> int:
+    """Get the ID of the last workday in the database."""
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM WorkDay ORDER BY id DESC LIMIT 1")
+        workday_id = cursor.fetchone()
+        return workday_id[0] if workday_id else 0
+
+
+def get_worklog_data_summary(workday_id: int):
+    """Fetch work log data for a specific workday and structure it as a list of dictionaries for display.
+
+    Args:
+        workday_id (int): The ID of the workday to fetch work log data for.
+
+    Returns:
+        list: A list of dictionaries containing work log data with the following keys: worklog_id, timestamp, check_in.
+        All are strings.
+    """
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, timestamp, check_in FROM WorkLog WHERE workday_id=?",
+            (workday_id,),
+        )
+        logs = cursor.fetchall()
+        return [
+            {
+                "uid": log[0],
+                "timestamp": log[1].split("T")[1].split(".")[0],
+                "check_in": log[2],
+            }
+            for log in logs
+        ]
+
+
 def delete_workday_entry(workday_id: int):
     """Delete a workday entry and its associated work logs from the database."""
     from siapp.db.models import DATABASE
@@ -493,6 +536,16 @@ def delete_workday_entry(workday_id: int):
         for log in work_logs:
             cursor.execute("DELETE FROM WorkLog WHERE id=?", (log[0],))
         cursor.execute("DELETE FROM WorkDay WHERE id=?", (workday_id,))
+        conn.commit()
+
+
+def delete_worlkog_entry(worklog_id: int):
+    """Delete a worklog entry from the database."""
+    from siapp.db.models import DATABASE
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM WorkLog WHERE id=?", (worklog_id,))
         conn.commit()
 
 
@@ -513,10 +566,10 @@ def get_hourslog_export_data() -> list:
         for work_day in work_days:
             workday_id, date, time_of_work, lunch_break, work_break = work_day
             d_workday = {
-                "Day": date,
-                "Work Time": time_of_work,
-                "Lunch Break": lunch_break,
-                "Pause": work_break,
+                "Day": date.split("T")[0],
+                "Work Time": time_of_work.split(".")[0],
+                "Lunch Break": lunch_break.split(".")[0],
+                "Pause": work_break.split(".")[0],
             }
 
             # Fetch associated work logs for each work day
@@ -531,12 +584,11 @@ def get_hourslog_export_data() -> list:
                 timestamp, check_in = log
                 timestamp = datetime.fromisoformat(timestamp).strftime("%H:%M")
                 if i % 2 == 0:
-                    d_workday[f"in {i//2 + 1}"] = timestamp
+                    d_workday[f"In {i//2 + 1}"] = timestamp
                 else:
-                    d_workday[f"out {i//2 + 1}"] = timestamp
+                    d_workday[f"Out {i//2 + 1}"] = timestamp
 
             data.append(d_workday)
-            print(d_workday)
 
     return data
 
@@ -551,6 +603,19 @@ def save_exported_data(output_folder: Path):
     with open(output_file, mode="w", newline="") as file:
         # Dynamically get field names from the data to handle varying keys (e.g., different "in/out" columns)
         fieldnames = {key for row in data for key in row.keys()}
-        writer = csv.DictWriter(file, fieldnames=sorted(fieldnames))
+        fields_start = [
+            f for f in fieldnames if "In " not in f and "Out " not in f
+        ]
+        fields_end = [f for f in fieldnames if "In " in f or "Out " in f]
+        n_fields_end = len(fields_end)
+        fields_end_last = []
+        for i in range(n_fields_end):
+            if i % 2 == 0:
+                fields_end_last.append(f"In {i//2 + 1}")
+            else:
+                fields_end_last.append(f"Out {i//2 + 1}")
+        fieldnames = fields_start + fields_end_last
+        print("Fieldnames:", fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)

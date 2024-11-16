@@ -49,7 +49,7 @@ requirements = sqlite3,Kivy-Garden==0.1.5,kivymd==1.2.0,android.permissions,pyth
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = resources/SIApp.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse

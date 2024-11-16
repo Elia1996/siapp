@@ -129,3 +129,32 @@
                     default_size_hint: 1, None
                     height: self.minimum_height
                     orientation: 'vertical'
+
+        # Horizontal Divider Line
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint_y: None
+            padding: dp(10)
+            spacing: dp(20)
+
+            BoxLayout:
+                size_hint_y: None
+                height: 1  # Set the height of the line
+                canvas.before:
+                    Color:
+                        rgba: 0.0, 0.75, 0.71, 1  # Black color
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+            MDLabel:
+                height: dp(30)
+                text: "Daily Check-in/Check-out:"
+                font_style: "Subtitle1"
+                halign: "left"
+
+            MDGridLayout:
+                id: chips_container
+                cols: 3
+                spacing: dp(7)
+                size_hint_y: None
+                height: self.minimum_height

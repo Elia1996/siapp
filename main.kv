@@ -44,9 +44,6 @@ BoxLayout:
                     spacing: "4dp"
                     padding: "12dp", 0, 0, "56dp"
 
-                MDNavigationDrawerLabel:
-                    text: "Navigation"
-
                 DrawerClickableItem:
                     icon: "home"
                     text: "Main Page"
@@ -54,23 +51,28 @@ BoxLayout:
                         screen_manager.current = "main_page"
                         nav_drawer.set_state("close")
 
+                MDNavigationDrawerLabel:
+                    text: "Time Management"
+
                 DrawerClickableItem:
                     icon: "clock-outline"
                     text: "Hours Log"
                     on_release:
                         screen_manager.current = "hourslog"
                         nav_drawer.set_state("close")
+                MDNavigationDrawerLabel:
+                    text: "Mnemotechnics"
 
                 DrawerClickableItem:
                     icon: "plus-circle"
-                    text: "Insertion"
+                    text: "PAO Insertion"
                     on_release:
                         screen_manager.current = "insertion"
                         nav_drawer.set_state("close")
 
                 DrawerClickableItem:
                     icon: "brain"
-                    text: "Exercise"
+                    text: "PAO Base Training"
                     on_release:
                         screen_manager.current = "exercise"
                         nav_drawer.set_state("close")

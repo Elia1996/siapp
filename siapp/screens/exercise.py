@@ -49,6 +49,8 @@ class ExerciseScreen(MDScreen):
         if association is None:
             return False
         l_possible_directions = []
+        if association.information is not None:
+            l_possible_directions.append(FlashcardDirection.I_TO_PAO)
         if association.character_text is not None:
             l_possible_directions.append(FlashcardDirection.P_TO_I)
         if association.action_text is not None:

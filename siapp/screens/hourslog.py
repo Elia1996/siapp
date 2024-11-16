@@ -9,6 +9,9 @@ from siapp.db.database import (
     get_fmanager_path,
     get_worked_hours_today,
     delete_workday_entry,
+    delete_worlkog_entry,
+    get_worklog_data_summary,
+    get_last_workday_id,
 )
 from siapp.db.models import create_database
 from kivymd.uix.filemanager import (
@@ -24,6 +27,7 @@ from kivymd.uix.pickers import (
     MDDatePicker,
     MDTimePicker,
 )
+from kivymd.uix.chip import MDChip, MDChipText
 
 Builder.load_file("siapp/screens/hourslog.kv")
 
@@ -105,6 +109,9 @@ class HoursLogScreen(MDScreen):
         self.update_loginout_status()
         self.update_summary_list()
         Clock.schedule_interval(self.update_worked_hours_today, 1)
+        last_workday_id = get_last_workday_id()
+        if last_workday_id:
+            self.update_chips(last_workday_id)
 
     def on_leave(self):
         Clock.unschedule(self.update_worked_hours_today)
@@ -118,13 +125,17 @@ class HoursLogScreen(MDScreen):
         if button.text == self.login_state_text:
             button.text = self.logout_state_text
             button.md_bg_color = self.theme_cls.primary_color
-            set_work_log(False, datetime.now())
+            self.set_work_log(False, datetime.now())
         else:
             button.text = self.login_state_text
             button.md_bg_color = self.loggedin_color
-            set_work_log(True, datetime.now())
+            self.set_work_log(True, datetime.now())
         analyze_hours()
         self.update_summary_list()
+
+    def set_work_log(self, checkin: bool, check_time):
+        uid = set_work_log(checkin, check_time)
+        self.add_check_chip(checkin, check_time.strftime("%H:%M:%S"), uid)
 
     def update_summary_list(self):
         l_data = get_hourslog_data_summary()
@@ -148,7 +159,7 @@ class HoursLogScreen(MDScreen):
     def add_checkin(self, instance, value):
         check_out_datetime = datetime.combine(self._new_date, value)
         print(check_out_datetime)
-        set_work_log(True, check_out_datetime)
+        self.set_work_log(True, check_out_datetime)
         self.update_summary_list()
 
     def add_checkout(self, instance, value):
@@ -156,7 +167,7 @@ class HoursLogScreen(MDScreen):
         check_out_datetime = datetime.combine(self._new_date, value)
         # Save the check out time
         print(check_out_datetime)
-        set_work_log(False, check_out_datetime)
+        self.set_work_log(False, check_out_datetime)
         self.update_summary_list()
 
     def add_checkin_time(self, instance, value, date_range):
@@ -191,3 +202,62 @@ class HoursLogScreen(MDScreen):
         )
         date_dialog.bind(on_save=on_ok_callback)
         return date_dialog.open()
+
+    def add_check_chip(self, checkin: bool, check_time: str, uid: int):
+        """Aggiunge una nuova chip dinamicamente nella sezione Check-in/Check-out"""
+        # Testo dinamico per la chip (esempio: orario di check-in/check-out)
+        check_time = "In " + check_time if checkin else "Out " + check_time
+
+        # Aggiungi la chip al container usando il data-binding
+        chip = MDChip(
+            MDChipText(text=check_time),
+            on_release=lambda x: self.show_chip_menu(x),
+            id=f"chip_{uid}",
+        )
+        self.ids.chips_container.add_widget(chip)
+
+    def show_chip_menu(self, instance):
+        """Mostra un menu per la chip selezionata"""
+        # Logica per mostrare un menu a discesa o azioni sulla chip
+        from kivymd.uix.menu import MDDropdownMenu
+
+        menu_items = [
+            # {
+            #    "text": "Modifica",
+            #    "on_release": lambda: self.edit_chip(instance),
+            # },
+            {
+                "text": "Elimina",
+                "on_release": lambda: self.remove_chip(instance),
+            },
+        ]
+        menu = MDDropdownMenu(
+            caller=instance,
+            items=menu_items,
+            width_mult=4,
+        )
+        menu.open()
+
+    def edit_chip(self, chip):
+        """Modifica una chip esistente"""
+        chip.text = "Check-in Modificato"
+
+    def remove_chip(self, chip):
+        """Rimuove una chip esistente"""
+        self.ids.chips_container.remove_widget(chip)
+        # Aggiorna il database
+        delete_worlkog_entry(int(chip.id.split("_")[1]))
+        self.update_summary_list()
+
+    def remove_all_chips(self):
+        """Rimuove tutte le chip esistenti"""
+        for chip in self.ids.chips_container.children:
+            self.ids.chips_container.remove_widget(chip)
+
+    def update_chips(self, worday_id: int):
+        """Aggiorna tutte le chip esistenti"""
+        self.remove_all_chips()
+        for i, log in enumerate(get_worklog_data_summary(worday_id)):
+            self.add_check_chip(log["check_in"], log["timestamp"], log["uid"])
+            if i > 20:
+                break

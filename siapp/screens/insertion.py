@@ -1,8 +1,5 @@
 from datetime import timedelta
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.filemanager import (
-    MDFileManager,
-)  # Usa MDFileManager al posto di FileChooserIconView
 from kivy.metrics import dp
 from plyer import filechooser
 from kivy.properties import ListProperty
@@ -14,22 +11,17 @@ from siapp.db.database import (
     get_fmanager_path,
     get_mean_response_time,
 )  # Ensure this function exists and connects to the database
-from siapp.db.models import create_database
 from kivymd.uix.menu import MDDropdownMenu
-from siapp.utils.images import path_to_bytes
 
 Builder.load_file("siapp/screens/insertion.kv")
 
 
 class InsertionScreen(MDScreen):
-    info_image_path = ListProperty([])
-    pao_image_path = ListProperty([])
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def on_pre_enter(self):
-        create_database()
+    def on_enter(self):
+        self.refresh_association_list()
 
     def save_association(self):
         add_association(
@@ -117,18 +109,15 @@ class InsertionScreen(MDScreen):
             filechooser.open_file(on_selection=self.handle_pao_image_selection)
 
     def handle_info_image_selection(self, selection):
+        print(selection)
         self.info_image_path = selection
+        if selection:
+            self.ids.information_image.source = selection[0]
 
     def handle_pao_image_selection(self, selection):
         self.pao_image_path = selection
-
-    def on_info_image_path(self, instance, value):
-        if value:
-            self.ids.information_image.source = value[0]
-
-    def on_pao_image_path(self, instance, value):
-        if value:
-            self.ids.pao_image.source = value[0]
+        if selection:
+            self.ids.pao_image.source = selection[0]
 
     def open_edit_menu(self, root):
         """Open the menu to modify the association"""

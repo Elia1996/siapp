@@ -7,7 +7,7 @@ title = SIApp
 package.name = siapp
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = org.eliaribaldone
 
 # (str) Source code where the main.py live
 source.dir = .

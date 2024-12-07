@@ -16,6 +16,14 @@ from kivymd.uix.menu import MDDropdownMenu
 Builder.load_file("siapp/screens/insertion.kv")
 
 
+def time_to_str(timesec):
+    timesec = str(timedelta(seconds=timesec))
+    # remove hours and minutes
+    timesec = ":".join(timesec.split(":")[2:])
+    timesec = timesec.split(".")[0] + "." + timesec.split(".")[1][:3]
+    return timesec
+
+
 class InsertionScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -45,28 +53,28 @@ class InsertionScreen(MDScreen):
         # Refresh the association list in the ExerciseScreen
         print("Getting all associations")
         associations = get_all_associations()
+        associations = sorted(associations, key=lambda x: x.retention_index)
 
         l_data = []
         print(
             f"Calculating response times for {len(associations)} associations"
         )
+        mean_time = None
+        n_mean_elements = 0
         for assoc in associations:
             print(f"Calculating response time for association {assoc.id}")
-            mean_response_time = get_mean_response_time(assoc)
+            mean_response_time, n_missing = get_mean_response_time(assoc)
             # Convert to timedelta
             if mean_response_time is None:
                 mean_response_time = "Nan"
             else:
-                mean_response_time = str(timedelta(seconds=mean_response_time))
-                # remove hours and minutes
-                mean_response_time = ":".join(
-                    mean_response_time.split(":")[1:]
+                mean_time = (
+                    mean_response_time
+                    if mean_time is None
+                    else mean_time + mean_response_time
                 )
-                mean_response_time = (
-                    mean_response_time.split(".")[0]
-                    + "."
-                    + mean_response_time.split(".")[1][:3]
-                )
+                n_mean_elements += 1
+                mean_response_time = time_to_str(mean_response_time)
             l_data.append(
                 {
                     "information_text": assoc.information,
@@ -92,6 +100,9 @@ class InsertionScreen(MDScreen):
                     "insertionscreen": self,
                 }
             ]
+        mean_time = mean_time / n_mean_elements
+        mean_time = time_to_str(mean_time)
+        self.ids.mean_time_label.text = f"Mean t [s]: {mean_time}"
         self.ids.associations_list.data = l_data
 
     def calculate_text_height(self, text, font_size=14):

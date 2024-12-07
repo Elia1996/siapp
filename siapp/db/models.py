@@ -152,6 +152,15 @@ class Association:
         self._changed.append("last_response_time_A_to_I")
 
     @property
+    def last_response_time_O_to_I(self) -> Optional[float]:
+        return self._data["last_response_time_O_to_I"]
+
+    @last_response_time_O_to_I.setter
+    def last_response_time_O_to_I(self, value: Optional[float]):
+        self._data["last_response_time_O_to_I"] = value
+        self._changed.append("last_response_time_O_to_I")
+
+    @property
     def creation_date(self) -> Optional[str]:
         return self._data["creation_date"]
 

@@ -7,6 +7,7 @@ from siapp.db.database import (
     get_element_number,
     update_association,
 )
+from siapp.db.models import Association
 from datetime import datetime
 from kivy.lang import Builder
 from enum import Enum
@@ -33,33 +34,41 @@ class ExerciseScreen(MDScreen):
         self.bl_direction: FlashcardDirection = None
 
     def on_enter(self):
+        calculate_retention_index()
         self.load_associations()
         self.next_association()
 
     def load_associations(self):
         # Load associations ordered by retention index and shuffle them
         self.associations = sorted(
-            get_all_associations(), key=lambda x: x.retention_index
+            get_all_associations(),
+            key=lambda x: x.retention_index,
+            reverse=True,
         )[:20]
-        random.shuffle(self.associations)
+        from siapp.db.models import Association
+
+        assoc: Association
+        for assoc in self.associations:
+            print(f"id: {assoc.id}, retention: {assoc.retention_index}")
 
     def choose_direction(self) -> bool:
         # Choose the direction of the flashcard
-        association = self.current_association
-        if association is None:
-            return False
-        l_possible_directions = []
-        if association.information is not None:
-            l_possible_directions.append(FlashcardDirection.I_TO_PAO)
-        if association.character_text is not None:
-            l_possible_directions.append(FlashcardDirection.P_TO_I)
-        if association.action_text is not None:
-            l_possible_directions.append(FlashcardDirection.A_TO_I)
-        if association.object_text is not None:
-            l_possible_directions.append(FlashcardDirection.O_TO_I)
-        if l_possible_directions == []:
-            return False
-        self.bl_direction = random.choice(l_possible_directions)
+        assoc: Association = self.current_association
+        d_ass = {
+            FlashcardDirection.I_TO_PAO: assoc.last_response_time_I_to_PAO,
+            FlashcardDirection.P_TO_I: assoc.last_response_time_P_to_I,
+            FlashcardDirection.A_TO_I: assoc.last_response_time_A_to_I,
+            FlashcardDirection.O_TO_I: assoc.last_response_time_O_to_I,
+        }
+        max_resp_time = 0
+        for direction, resptime in d_ass.items():
+            if resptime is None:
+                self.bl_direction = direction
+                break
+            if resptime > max_resp_time:
+                max_resp_time = resptime
+                self.bl_direction = direction
+
         return True
 
     def next_association(self):

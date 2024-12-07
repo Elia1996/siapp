@@ -166,6 +166,6 @@ nav:
   - Hours Log: hours_logging.md
 - Mnemotechnics:
   - PAO: pao.md  
-- Installation: installation.md
-- Deployment: deployment.md
-- About: about.md
+# - Installation: installation.md
+# - Deployment: deployment.md
+# - About: about.md

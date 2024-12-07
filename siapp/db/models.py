@@ -298,7 +298,11 @@ def create_database():
     global DATABASE
     # Database file
     if platform == "android":
-        DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
+        from android.storage import primary_external_storage_path
+        import os
+
+        storage_base_path = primary_external_storage_path()
+        DATABASE = os.path.join(storage_base_path, "SiApp", "memory_app.db")
     else:
         DATABASE = ".data/memory_app.db"
         from pathlib import Path
@@ -311,6 +315,8 @@ def create_database():
 
             os.makedirs(".data", exist_ok=True)
 
+    print(f"Database at {DATABASE}")
+
     try:
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
@@ -320,5 +326,3 @@ def create_database():
         conn.close()
     except sqlite3.OperationalError:
         create_tables()
-
-    print(f"Database at {DATABASE}")

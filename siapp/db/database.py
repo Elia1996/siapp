@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Tuple
 import sqlite3
 from siapp.db.models import Association
 import csv
 from kivy.utils import platform
 import os
+from siapp.utils.retention_index import retention_index
 
 
 def image_path_to_bytes(image_path: str) -> bytes:
@@ -120,7 +121,7 @@ def get_element_number() -> int:
         return cursor.fetchone()[0]
 
 
-def get_mean_response_time(assoc: Association) -> Optional[float]:
+def get_mean_response_time(assoc: Association) -> Tuple[Optional[float], int]:
     association_id = assoc.id
     from siapp.db.models import DATABASE
 
@@ -134,11 +135,12 @@ def get_mean_response_time(assoc: Association) -> Optional[float]:
         """,
             (association_id,),
         )
-        response_times = cursor.fetchone()
-        response_times = [t for t in response_times if t is not None]
+        response_times_orig = cursor.fetchone()
+        response_times = [t for t in response_times_orig if t is not None]
+        n_missing = len(response_times_orig) - len(response_times)
         if response_times:
-            return sum(response_times) / len(response_times)
-        return None
+            return sum(response_times) / len(response_times), n_missing
+        return None, n_missing
 
 
 def fetchall_to_associations(fetchall: List[tuple]) -> List[Association]:
@@ -220,7 +222,10 @@ def get_association_by_id(association_id: int) -> Association:
 
 
 def calculate_retention_index():
-    """Calculate the retention index for each association in the database."""
+    """Calculate the retention index for each association in the database.
+
+    The retention index is
+    """
     now = datetime.now()
     from siapp.db.models import DATABASE
 
@@ -237,7 +242,7 @@ def calculate_retention_index():
             association_id = association[0]
             refresh_count = association[13]
             if refresh_count > 0:
-                mean_single_response_time = get_mean_response_time(
+                mean_single_response_time, n_missing = get_mean_response_time(
                     Association(id=association_id)
                 )
                 if mean_single_response_time is not None:
@@ -258,8 +263,9 @@ def calculate_retention_index():
             ]  # Assuming difficulty is stored at index 13
 
             # Adjust difficulty based on mean response time if it exists
+            n_missing = 0
             if mean_response_time is not None:
-                mean_time = get_mean_response_time(
+                mean_time, n_missing = get_mean_response_time(
                     Association(id=association_id)
                 )
                 if mean_time is not None and mean_response_time != 0:
@@ -278,6 +284,7 @@ def calculate_retention_index():
                     association[13],  # refresh_count
                     difficulty,
                 )
+                retention_idx /= n_missing + 1
 
             # Update the association with the new retention index
             cursor.execute(
@@ -312,14 +319,6 @@ def current_state() -> bool:
             return False  # No log found
 
         return bool(log[0])  # Returns True if check_in is 1, False otherwise
-
-
-def retention_index(
-    time_delta: timedelta, refresh_count: int, difficulty: float
-) -> float:
-    # Example placeholder for retention calculation logic
-    days = time_delta.days
-    return max(0, (refresh_count / (1 + difficulty * days)))
 
 
 # Funzioni per i log di lavoro

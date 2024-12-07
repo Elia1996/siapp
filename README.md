@@ -57,3 +57,9 @@ I used this command to add the license header to all the files:
 ```bash
 licenseheaders -t lgplv3 -o "Elia Ribaldone" -y 2024 -n SiApp -u "https://github.com/Elia1996/siapp" -d siapp
 ```
+
+# Github Workflow
+
+The workflow is in the [.github/workflows](.github/workflows) folder.
+
+At the moment github workflow doesn't work due to some problems with buildozer in the pipeline. I've still to figure out how to solve this problem.

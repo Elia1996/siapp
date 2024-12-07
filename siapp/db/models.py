@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2024 Elia Ribaldone.
 #
-# This file is part of SiApp 
+# This file is part of SiApp
 # (see https://github.com/Elia1996/siapp).
 #
 # This program is free software: you can redistribute it and/or modify
@@ -320,3 +320,5 @@ def create_database():
         conn.close()
     except sqlite3.OperationalError:
         create_tables()
+
+    print(f"Database at {DATABASE}")

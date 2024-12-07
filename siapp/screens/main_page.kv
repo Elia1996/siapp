@@ -9,3 +9,11 @@
             font_size: 32
             size_hint_y: None
             height: 100
+
+        MDRaisedButton:
+            text: "Extract DB"
+            on_press: root.extract_db()
+        
+        MDLabel:
+            id: db_status
+            text: ""

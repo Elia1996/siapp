@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2024 Elia Ribaldone.
 #
-# This file is part of SiApp 
+# This file is part of SiApp
 # (see https://github.com/Elia1996/siapp).
 #
 # This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ def get_fmanager_path() -> str:
             print("Opening in:", storage_path)
             return storage_path
     print("Opening in:", os.path.expanduser("~"))
-    return "/"
+    return "./"
 
 
 def add_association(

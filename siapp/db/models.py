@@ -298,14 +298,7 @@ def create_database():
     global DATABASE
     # Database file
     if platform == "android":
-        from android.storage import primary_external_storage_path
-        import os
-
-        storage_base_path = primary_external_storage_path()
-        DATABASE = os.path.join(storage_base_path, "SiApp", "memory_app.db")
-        if not os.path.exists(DATABASE):
-            os.makedirs(os.path.dirname(DATABASE), exist_ok=True)
-
+        DATABASE = App.get_running_app().user_data_dir + "/memory_app.db"
     else:
         DATABASE = ".data/memory_app.db"
         from pathlib import Path

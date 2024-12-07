@@ -11,6 +11,7 @@ kivy = "^2.3.0"
 kivymd = "^1.2.0"
 pyjnius = "^1.6.1"
 plyer = "^2.1.0"
+licenseheaders = "^0.8.8"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,3 +1,21 @@
+<!--
+Copyright (c) 2024 Elia Ribaldone.
+
+This file is part of SiApp 
+(see https://github.com/Elia1996/siapp).
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.-->
 # SIApp
 Self Improvement Application
 
@@ -32,3 +50,10 @@ The Mnemotechnique part is composed of two sections at the moment:
     - 🛠️ Create the page
     - 🛠️ Display min, max and mean response time divided by I to PAO and PAO to I.
     - 🛠️ Graph of the mean response time during past training day.
+
+# License
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+I used this command to add the license header to all the files:
+```bash
+licenseheaders -t lgplv3 -o "Elia Ribaldone" -y 2024 -n SiApp -u "https://github.com/Elia1996/siapp" -d siapp
+```

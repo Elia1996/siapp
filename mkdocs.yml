@@ -162,10 +162,10 @@ extra:
 nav:
 - SiApp:
   - Introduction: index.md
+  - Installation: installation.md
+  - Building the App: deployment.md 
 - Time Management:
   - Hours Log: hours_logging.md
 - Mnemotechnics:
   - PAO: pao.md  
-# - Installation: installation.md
-# - Deployment: deployment.md
 # - About: about.md
